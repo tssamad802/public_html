@@ -1,0 +1,81 @@
+RewriteEngine On
+Options -Indexes
+
+# Block invalid url trackprf.com
+RewriteCond %{HTTP_REFERER} ^https?://.*trckprf\.com [NC]
+RewriteRule ^ - [F,L]
+
+# Set base for local development
+RewriteBase /public_html/
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+RewriteRule ^([a-zA-Z0-9-]+).html$ /public_html/index.php?option=$1 [NC,QSA]
+
+RewriteRule ^ar([\/]?)$ /public_html/index.php?lang=ar [QSA]
+RewriteRule ^en([\/]?)$ /public_html/index.php?lang=en [QSA]
+
+# For Arabic
+RewriteRule ^ar\/([a-zA-Z0-9-_]+)\.html$ /public_html/index.php?lang=ar&option=$1 [QSA]
+RewriteRule ^ar\/([a-zA-Z0-9-]+)$ /public_html/index.php?lang=ar&option=$1 [QSA]
+RewriteRule ^ar\/([a-zA-Z0-9-]+)\/([a-zA-Z0-9-_]+).html$ /public_html/index.php?lang=ar&option=$1&suboption=$2 [QSA]
+RewriteRule ^ar\/([a-zA-Z0-9-]+)\/([a-zA-Z0-9-_]+)$ /public_html/index.php?lang=ar&option=$1&url=$2 [QSA]
+
+RewriteRule ^([a-zA-Z0-9-]+)$ /public_html/index.php?option=$1 [QSA]
+RewriteRule ^([a-zA-Z0-9-]+)\/([a-zA-Z0-9-_]+).html$ /public_html/index.php?option=$1&suboption=$2 [QSA]
+RewriteRule ^([a-zA-Z0-9-]+)\/([a-zA-Z0-9-_]+)$ /public_html/index.php?option=$1&url=$2 [QSA]
+
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+
+    <FilesMatch "\.(ico|jpeg|jpg|png|gif|css|js|woff|woff2|ttf|svg|eot|pdf)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+    <FilesMatch "banners/.*\.(jpeg|jpg|png)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+<IfModule pagespeed_module>
+    ModPagespeed off
+</IfModule>
+
+# GZIP Compression
+<IfModule mod_gzip.c>
+    mod_gzip_on Yes
+    mod_gzip_dechunk Yes
+    mod_gzip_item_include file \.(html?|txt|css|js|php|pl)$
+    mod_gzip_item_include handler ^cgi-script$
+    mod_gzip_item_include mime ^text/.*
+    mod_gzip_item_include mime ^application/x-javascript.*
+    mod_gzip_item_exclude mime ^image/.*
+    mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
+</IfModule>
+
+# Local PHP settings
+<IfModule php8_module>
+    php_flag display_errors On
+    php_value max_execution_time 90
+    php_value max_input_time 100
+    php_value max_input_vars 5000
+    php_value memory_limit 512M
+    php_value post_max_size 128M
+    php_value session.gc_maxlifetime 1440
+    php_value upload_max_filesize 128M
+    php_flag zlib.output_compression On
+</IfModule>
+<IfModule lsapi_module>
+    php_flag display_errors On
+    php_value max_execution_time 90
+    php_value max_input_time 100
+    php_value max_input_vars 5000
+    php_value memory_limit 512M
+    php_value post_max_size 128M
+    php_value session.gc_maxlifetime 1440
+    php_value upload_max_filesize 128M
+    php_flag zlib.output_compression On
+</IfModule>

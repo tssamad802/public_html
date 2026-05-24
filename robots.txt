@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /go-coupon.php
+Disallow: /go-coupon/
+Disallow: /go-store.php
+Disallow: /go-store/
+Disallow: /market.php
+Disallow: /mail.grabdiscountcodes.com
+Disallow: /demo2.grabdiscountcodes.com
+Disallow: /grabdiscountcodes.com/ajax/ajax_store.php
+Disallow: /grabdiscountcodes.com/ajax/ajax_coupon_category.php
+Allow: / sitemap: https://grabdiscountcodes.com/sitemap.xml
