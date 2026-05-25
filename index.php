@@ -153,21 +153,18 @@ if (isset($_REQUEST['option']) && $_REQUEST['option'] != '') {
         // 		else
 // 			$currentpage = "predefinedpages/coupon_category";
     } else if ($_REQUEST['option'] == COUPON) {
-        $query = "select * from tblstore where URLKeyword='" . $_REQUEST['option'] . "'";
-        $objNav->query($query);
-        if ($objNav->num_rows() > 0) {
-            $objNav->next_record();
-            $currentpage = "predefinedpages/coupon";
-
-            //now fill meta data
-            $meta_data['Title'] = $objNav->f("MetaTitle");
-            $meta_data['Description'] = $objNav->f("MetaDescription");
-            $meta_data['Keywords'] = $objNav->f("MetaKeywords");
-            $meta_data['Others'] = $objNav->f("MetaOthers");
-            if (file_exists(FILES_FOLDER . '/' . BANNER_FOLDER . "/" . TXT_THUMBNAIL_IMAGE_PATH . $objNav->f("BannerImage"))) {
-                $bannerImage = RESOURCES_DOMAIN . '/' . FILES_FOLDER . '/' . BANNER_FOLDER . "/" . TXT_THUMBNAIL_IMAGE_PATH . $objNav->f("BannerImage");
+        $currentpage = "predefinedpages/coupon";
+        if ($_REQUEST['url'] != '') {
+            $query = "select * from tblcoupontype where URLKeyword='" . $_REQUEST['url'] . "'";
+            $objNav->query($query);
+            if ($objNav->num_rows() > 0) {
+                $objNav->next_record();
+                //now fill meta data
+                $meta_data['Title'] = $objNav->f("Title");
+                $meta_data['Description'] = $objNav->f("MetaDescription");
+                $meta_data['Keywords'] = $objNav->f("MetaKeywords");
+                $meta_data['Others'] = $objNav->f("MetaOthers");
             }
-            // $_SESSION['TRA_LANG_SWITCH_CURL'] = genURLLangSwitch($_SESSION[TRA_FRONT_WEB_LANG]).'eventdetails/'.$objNav->f("URLKeyword");
         }
     } else if ($_REQUEST['option'] == "expire-coupon") {
         $currentpage = "predefinedpages/expireCoupon";

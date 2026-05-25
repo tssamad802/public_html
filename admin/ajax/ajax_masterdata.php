@@ -4,9 +4,9 @@ $CheckDeletePermissioon = CheckModulePermission($UserRecordGetting['TableID'],$_
 if(isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing')
 {
 //start search
-$Active = $_REQUEST['Active'];
-$q = $_REQUEST['q'];
-$whereCond =='';
+$Active = isset($_REQUEST['Active']) ? $_REQUEST['Active'] : '';
+$q = isset($_REQUEST['q']) ? $_REQUEST['q'] : '';
+$whereCond = '';
 if($q!='')
 {
 	$whereCond .= ' and (RoleName LIKE "%'.$q.'%" )';

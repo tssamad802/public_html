@@ -12,7 +12,7 @@ if (!isset($RUNFILE_FROM_INDEX_PAGE)) {
 
         <!-- /Title -->
         <?php
-        if (!isset($_REQUEST['PageType']) && $_REQUEST['PageType'] == '') {
+        if (!isset($_REQUEST['PageType']) || $_REQUEST['PageType'] == '') {
             checkPermission("ViewPermissions", $UserRecordGetting['TableID'], $_REQUEST['SubLinkID']);
             ?>
 

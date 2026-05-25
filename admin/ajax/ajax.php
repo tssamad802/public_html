@@ -35,4 +35,8 @@ if (isset($_SESSION[WEB_SESSION . '_userid']) && $_SESSION[WEB_SESSION . '_useri
 
 if($pagelimit==0)
 	$pagelimit = PAGE_LIMIT;
+
+if (!isset($UserRecordGetting['TableID'])) {
+	$UserRecordGetting['TableID'] = 0;
+}
 ?>

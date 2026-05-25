@@ -19,40 +19,40 @@ if(isset($_REQUEST['RoleID']))
 	$RoleID = $_REQUEST['RoleID'];*/
 $whereCond ='';
 
-    if($_POST['ProductName']!='')
+    if(isset($_POST['ProductName']) && $_POST['ProductName']!='')
     {
         $whereCond .=' and p.ProductName LIKE "%'.$_POST['ProductName'].'%"';
     }
 
-    if($_POST['StoreID'] > 0)
+    if(isset($_POST['StoreID']) && $_POST['StoreID'] > 0)
     {
         $whereCond .=' and p.StoreID = "'.$_POST['StoreID'].'"';
     }
-    if($_POST['url'] != "")
+    if(isset($_POST['url']) && $_POST['url'] != "")
     {
         $whereCond .=' and p.url = "'.$_POST['url'].'"';
     }
-    if($_POST['discount'] != "")
+    if(isset($_POST['discount']) && $_POST['discount'] != "")
     {
         $whereCond .=' and p.discount = "'.$_POST['discount'].'"';
     }
-    if($_POST['endDate'] != "")
+    if(isset($_POST['endDate']) && $_POST['endDate'] != "")
     {
         $whereCond .=' and p.endDate = "'.$_POST['endDate'].'"';
     }
-    if($_POST['startDate'] != "")
+    if(isset($_POST['startDate']) && $_POST['startDate'] != "")
     {
         $whereCond .=' and p.startDate = "'.$_POST['startDate'].'"';
     }
-    if($_POST['CreatedBy'] > 0)
+    if(isset($_POST['CreatedBy']) && $_POST['CreatedBy'] > 0)
     {
         $whereCond .=' and p.CreatedBy = "'.$_POST['CreatedBy'].'"';
     }
-    if($_POST['ModifiedBy'] > 0)
+    if(isset($_POST['ModifiedBy']) && $_POST['ModifiedBy'] > 0)
     {
         $whereCond .=' and p.ModifiedBy = "'.$_POST['ModifiedBy'].'"';
     }
-    if($_POST['active'] > -1)
+    if(isset($_POST['active']) && $_POST['active'] > -1)
     {
         if($_POST['active'] == 0)
             $whereCond .=' and p.Active = 0';
@@ -61,7 +61,7 @@ $whereCond ='';
         if($_POST['active'] == 2)
             $whereCond .=' and p.Active = 2';
     }
-    if($_POST['feature'] > 0)
+    if(isset($_POST['feature']) && $_POST['feature'] > 0)
     {
         if($_POST['feature'] ==1)
             $whereCond .=' and p.featured = 1';
@@ -141,13 +141,13 @@ if($db->num_rows() > 0)
 		echo '<div class="norecordfound">'.DSB_NO_RECORDS.'</div>';
 	}
 	
-	if($pagination->tot_pages > 1)
+	if(isset($pagination) && $pagination->tot_pages > 1)
 	{
 		?>
 		<tr>
 			<td colspan="11">
 				<center>
-					  <?php echo $page_links;?>
+					  <?php echo isset($page_links) ? $page_links : '';?>
 				</center>
 			</td>
 		</tr>

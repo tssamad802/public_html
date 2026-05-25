@@ -380,6 +380,7 @@ function SimpleAjax(pageUrl,FormId,divId){
 		}
 	});
 
+	//return dataVar;
 	return false;
 }
 

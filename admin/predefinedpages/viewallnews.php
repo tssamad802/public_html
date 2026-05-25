@@ -150,13 +150,19 @@ if(!isset($_REQUEST['PageType']))
         <div class="hk-pg-header mb-0 headerboxdesign">
 
             <h4 class="hk-pg-title" id="titleheading"><?=FetchSubLinkMenuName($_REQUEST['SubLinkID'])?></h4>
+            <?php 
+            // echo "<script>console.log(" . json_encode(FetchSubLinkMenuName($_REQUEST['SubLinkID'])) . ");</script>"; 
+            ?>
 
             <div class="d-flex mb-0">
                 <a class="btn btn-primary btn-sm" href="javascript:;" onclick="$('#displaysearch').slideToggle();">Search</a>
                 &nbsp;&nbsp;
-                <a class="btn btn-primary btn-sm"
+                <a class="btn btn-primary btn-sm" id="addCouponBtn"
                     href="<?="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=ManageRecord&Trigger=add")?>">Add Coupon</a>
             </div>
+            <!-- <script>
+                console.log(document.getElementById('addCouponBtn').href);
+            </script> -->
         </div>
 
         <!-- Row -->
@@ -169,8 +175,9 @@ if(!isset($_REQUEST['PageType']))
                             <div class="table-wrap" id="resultDiv">
 								<div class="norecordfound"><?=TXT_PLEASE_WAIT_DATA_LOAD?></div>
                             <script type="text/javascript">
-								SimpleAjax('ajax_news.php?<?=EncodeUrl("FireAction=listing&action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID'])?>','searchfrm','resultDiv');
-							</script>
+                                SimpleAjax('ajax_news.php?<?=EncodeUrl("FireAction=listing&action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID'])?>','searchfrm','resultDiv');
+                                //console.log(SimpleAjax('ajax_news.php?<?=EncodeUrl("FireAction=listing&action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID'])?>','searchfrm','resultDiv'));
+                            </script>
                         </div>
                     </div>
                 </section>
