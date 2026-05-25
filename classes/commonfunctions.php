@@ -624,17 +624,11 @@ function sendemail($emailToSend, $mailsubject, $message, $headers)
 //Check User Permission
 function checkPermission($permissiontype, $UserID, $SubLinkID)
 {
-	$db = new DB_Sql();
-	//Check Required Permissions
-	$FetchPermission = "select " . $permissiontype . " from tbluserpermissions where SubLinkID=$SubLinkID and UserID=$UserID";
-	$db->query($FetchPermission);
-	$db->next_Record();
-	if ($db->f(0) == 1) {
+	if (CheckModulePermission($UserID, $SubLinkID, $permissiontype) == 1) {
 		return true;
-	} else {
-		showmessage(TXT_PERMISSION_ERROR);
-		redirect(DOMAINNAME . '/admin', 0);
 	}
+	showmessage(TXT_PERMISSION_ERROR);
+	redirect(DOMAINNAME . '/admin', 0);
 }
 
 //Return User Permission
@@ -1210,11 +1204,168 @@ function decodeencriptstring($string)
 
 function CheckModulePermission($UserID, $SublinkID, $ActionType)
 {
+	$UserID = (int) $UserID;
+	$SublinkID = (int) $SublinkID;
 	$db = new DB_Sql();
 	$FetchModuleCheck = "select $ActionType from tbluserpermissions where UserID=$UserID and SublinkID=$SublinkID";
 	$db->query($FetchModuleCheck);
-	$db->next_Record();
-	return $db->f(0);
+	if ($db->num_rows() > 0) {
+		$db->next_Record();
+		return $db->f(0);
+	}
+
+	$dbRole = new DB_Sql();
+	$dbRole->query("select RoleID from tblsystemusers where TableID=$UserID");
+	if ($dbRole->next_record()) {
+		$roleId = (int) $dbRole->f('RoleID');
+		if ($roleId > 0) {
+			$FetchRoleCheck = "select $ActionType from tblrolespermission where RoleID=$roleId and SublinkID=$SublinkID";
+			$dbRole->query($FetchRoleCheck);
+			if ($dbRole->num_rows() > 0) {
+				$dbRole->next_Record();
+				return $dbRole->f(0);
+			}
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Build admin sidebar sublink tree for a master menu.
+ * Rows whose ParentID is missing are promoted to the top level (orphans).
+ */
+function buildAdminNavSublinkTree($masterLinkId)
+{
+	global $db1;
+	$masterLinkId = (int) $masterLinkId;
+	$sql = "SELECT * FROM tblsublinks WHERE Active > 0 AND MasterLinkID='" . $masterLinkId . "' ORDER BY Sequence";
+	$db1->query($sql);
+	$byId = [];
+	while ($db1->next_record()) {
+		$id = (int) $db1->f('TableID');
+		$byId[$id] = [
+			'id' => $id,
+			'parent_id' => (int) $db1->f('ParentID'),
+			'link_name' => $db1->f('LinkName' . LANG_SEP_DB),
+			'url' => $db1->f('URL'),
+			'active' => (int) $db1->f('Active'),
+			'table_name' => $db1->f('TableName'),
+			'children' => [],
+		];
+	}
+	$virtualParents = [];
+	$tree = [];
+	foreach ($byId as $id => $node) {
+		$pid = $node['parent_id'];
+		if ($pid > 0 && isset($byId[$pid])) {
+			$byId[$pid]['children'][] = &$byId[$id];
+		} elseif ($pid > 0) {
+			if (!isset($virtualParents[$pid])) {
+				$virtualParents[$pid] = [
+					'id' => $pid,
+					'parent_id' => 0,
+					'link_name' => 'Submenu',
+					'url' => '',
+					'active' => 2,
+					'table_name' => '',
+					'children' => [],
+					'is_virtual' => true,
+				];
+			}
+			$virtualParents[$pid]['children'][] = &$byId[$id];
+		} else {
+			$tree[] = &$byId[$id];
+		}
+	}
+	foreach ($virtualParents as $virtualParent) {
+		$tree[] = $virtualParent;
+	}
+	unset($node);
+	return $tree;
+}
+
+function adminNavSublinkTreeHasVisibleNode($nodes, $userId)
+{
+	foreach ($nodes as $node) {
+		if (CheckModulePermission($userId, $node['id'], 'ViewPermissions') == 1) {
+			return true;
+		}
+		if (!empty($node['children']) && adminNavSublinkTreeHasVisibleNode($node['children'], $userId)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function adminNavSublinkTreeContainsId($nodes, $subLinkId)
+{
+	$subLinkId = (int) $subLinkId;
+	foreach ($nodes as $node) {
+		if ($node['id'] === $subLinkId) {
+			return true;
+		}
+		if (!empty($node['children']) && adminNavSublinkTreeContainsId($node['children'], $subLinkId)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function adminNavSublinkNodeHasVisibleChild($node, $userId)
+{
+	foreach ($node['children'] as $child) {
+		if (CheckModulePermission($userId, $child['id'], 'ViewPermissions') == 1) {
+			return true;
+		}
+		if (!empty($child['children']) && adminNavSublinkNodeHasVisibleChild($child, $userId)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function renderAdminNavSublinkTreeHtml($nodes, $userId, $depth = 1)
+{
+	$html = '';
+	$activeSubLinkId = isset($_REQUEST['SubLinkID']) ? (int) $_REQUEST['SubLinkID'] : 0;
+	foreach ($nodes as $node) {
+		if (!empty($node['is_virtual'])) {
+			if (!adminNavSublinkNodeHasVisibleChild($node, $userId)) {
+				continue;
+			}
+		} elseif (CheckModulePermission($userId, $node['id'], 'ViewPermissions') != 1) {
+			continue;
+		}
+		$hasVisibleChildren = !empty($node['is_virtual']) || adminNavSublinkNodeHasVisibleChild($node, $userId);
+		if ($hasVisibleChildren) {
+			$attopenattr = '';
+			$openmenuclass = '';
+			if ($activeSubLinkId && adminNavSublinkTreeContainsId([$node], $activeSubLinkId)) {
+				$attopenattr = 'aria-expanded="true"';
+				$openmenuclass = 'show';
+			}
+			$levelClass = $depth >= 2 ? 'collapse-level-2' : 'collapse-level-1';
+			$html .= '<li class="nav-item">';
+			$html .= '<a class="nav-link" href="javascript:void(0);" data-toggle="collapse" data-target="#subopen' . $node['id'] . '" ' . $attopenattr . '>';
+			$html .= '<span class="nav-link-text">' . htmlspecialchars($node['link_name'], ENT_QUOTES, 'UTF-8') . '</span></a>';
+			$html .= '<ul id="subopen' . $node['id'] . '" class="nav flex-column collapse ' . $levelClass . ' ' . $openmenuclass . '">';
+			$html .= '<li class="nav-item"><ul class="nav flex-column">';
+			$html .= renderAdminNavSublinkTreeHtml($node['children'], $userId, $depth + 1);
+			$html .= '</ul></li></ul></li>';
+		} elseif (!empty($node['is_virtual'])) {
+			continue;
+		} else {
+			$selectedClass = ($activeSubLinkId === $node['id']) ? 'active' : '';
+			$tableName = ($node['active'] == 1) ? '&TableName=' . $node['table_name'] : '';
+			$href = 'index.php?' . EncodeUrl('action=' . $node['url'] . '&SubLinkID=' . $node['id'] . $tableName);
+			$linkClass = 'nav-link' . ($depth > 1 ? ' sublinktitle' : '');
+			$html .= '<li class="nav-item ' . $selectedClass . '">';
+			$html .= '<a class="' . $linkClass . '" href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '">';
+			$html .= htmlspecialchars($node['link_name'], ENT_QUOTES, 'UTF-8') . '</a></li>';
+		}
+	}
+	return $html;
 }
 
 function getCountRecord($TableName, $WhereFiled, $WhereFiledValue)
@@ -1430,9 +1581,11 @@ function clearTextForDb($text)
 
 function clearTextForField($text)
 {
-	$text = stripslashes($text);
+	if ($text === null || $text === '') {
+		return '';
+	}
 
-	return $text;
+	return stripslashes($text);
 }
 
 function clearTextForFieldTextarea($text)

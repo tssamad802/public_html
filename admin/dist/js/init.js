@@ -64,13 +64,27 @@ var pangong = function(){
 		$('[data-toggle="popover"]').popover()
 	
 	/*Navbar Collapse Animation*/
-	var navbarNavCollapse = $('.hk-nav .navbar-nav  li');
 	var navbarNavAnchor = '.hk-nav .navbar-nav  li a';
 	$(document).on("click",navbarNavAnchor,function (e) {
-		if ($(this).attr('aria-expanded') === "false")
-				$(this).blur();
-			$(this).parent().siblings().find('.collapse').collapse('hide');
-			$(this).parent().find('.collapse').collapse('hide');
+		if ($(this).attr('data-toggle') !== 'collapse') {
+			return;
+		}
+		if ($(this).attr('aria-expanded') === "false") {
+			$(this).blur();
+		}
+		$(this).parent().siblings().find('.collapse').collapse('hide');
+	});
+
+	/*Recalculate sidebar scroll area when submenus expand*/
+	var refreshNavScroll = function() {
+		var $navScroll = $('.hk-nav .nicescroll-bar');
+		if ($navScroll.length && $navScroll.parent().hasClass('slimScrollDiv')) {
+			$navScroll.slimScroll({ destroy: true });
+			$navScroll.slimscroll({height:'100%',color: '#d6d9da', disableFadeOut : true,borderRadius:0,size:'6px',enableKeyNavigation: true,opacity:.8});
+		}
+	};
+	$(document).on('shown.bs.collapse hidden.bs.collapse', '.hk-nav .collapse', function () {
+		refreshNavScroll();
 	});
 	
 	/*Card Remove*/

@@ -9,6 +9,7 @@ if (is_dir($localSessionPath) && is_writable($localSessionPath)) {
 session_start();
 
 include_once(__DIR__ . "/../classes/commonfunctions.php");
+DecodeUrl();
 
 //  echo '<pre>';
 //  print_r( $_SESSION );

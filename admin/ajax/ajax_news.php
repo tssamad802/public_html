@@ -1,10 +1,14 @@
 <?php
 require_once 'ajax.php';
-$CheckDeletePermissioon = CheckModulePermission($UserRecordGetting['TableID'],$_REQUEST['SubLinkID'],"DeletePermissions");
+$userTableId = (is_array($UserRecordGetting) && isset($UserRecordGetting['TableID'])) ? (int) $UserRecordGetting['TableID'] : 0;
+$subLinkId = isset($_REQUEST['SubLinkID']) ? (int) $_REQUEST['SubLinkID'] : 0;
+$CheckDeletePermissioon = $userTableId ? CheckModulePermission($userTableId, $subLinkId, "DeletePermissions") : 0;
 if(isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing')
 {
 //start search
 $whereCond ='';
+$filterActive = isset($_POST['active']) ? (int) $_POST['active'] : -1;
+$filterFeature = isset($_POST['feature']) ? (int) $_POST['feature'] : -1;
 
 if($_POST['CouponName']!='')
 {
@@ -39,20 +43,20 @@ if($_POST['ModifiedBy'] > 0)
 {
   $whereCond .=' and c.ModifiedBy = "'.$_POST['ModifiedBy'].'"';
 }
-if($_POST['active'] > -1)
+if($filterActive > -1)
 {
-    if($_POST['active'] == 0)
+    if($filterActive == 0)
         $whereCond .=' and c.Active = 0';
-    if($_POST['active'] == 1)
+    if($filterActive == 1)
         $whereCond .=' and c.Active = 1';
-    if($_POST['active'] == 2)
+    if($filterActive == 2)
         $whereCond .=' and c.Active = 2';
 }
-if($_POST['feature'] > 0)
+if($filterFeature > 0)
 {
-    if($_POST['feature'] ==1)
+    if($filterFeature ==1)
         $whereCond .=' and c.featured = 1';
-    if($_POST['feature'] == 0)
+    if($filterFeature == 0)
         $whereCond .=' and c.featured = 0';
 }
 
@@ -316,6 +320,8 @@ if(isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'sortstore')
 
 //start search
     $whereCond ='';
+    $filterActive = isset($_POST['active']) ? (int) $_POST['active'] : -1;
+    $filterFeature = isset($_POST['feature']) ? (int) $_POST['feature'] : -1;
 
     if($_POST['name']!='')
     {
@@ -350,20 +356,20 @@ if(isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'sortstore')
     {
         $whereCond .=' and s.ModifiedBy = "'.$_POST['ModifiedBy'].'"';
     }
-    if($_POST['active'] > -1)
+    if($filterActive > -1)
     {
-        if($_POST['active'] == 0)
+        if($filterActive == 0)
             $whereCond .=' and s.Active = 0';
-        if($_POST['active'] == 1)
+        if($filterActive == 1)
             $whereCond .=' and s.Active = 1';
-        if($_POST['active'] == 2)
+        if($filterActive == 2)
             $whereCond .=' and s.Active = 2';
     }
-    if($_POST['feature'] > 0)
+    if($filterFeature > 0)
     {
-        if($_POST['feature'] ==1)
+        if($filterFeature ==1)
             $whereCond .=' and s.featured = 1';
-        if($_POST['feature'] == 0)
+        if($filterFeature == 0)
             $whereCond .=' and s.featured = 0';
     }
 
@@ -438,6 +444,8 @@ if(isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingstore')
 
 //start search
     $whereCond ='';
+    $filterActive = isset($_POST['active']) ? (int) $_POST['active'] : -1;
+    $filterFeature = isset($_POST['feature']) ? (int) $_POST['feature'] : -1;
 
     if($_POST['name']!='')
     {
@@ -472,20 +480,20 @@ if(isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingstore')
     {
         $whereCond .=' and s.ModifiedBy = "'.$_POST['ModifiedBy'].'"';
     }
-    if($_POST['active'] > -1)
+    if($filterActive > -1)
     {
-        if($_POST['active'] == 0)
+        if($filterActive == 0)
             $whereCond .=' and s.Active = 0';
-        if($_POST['active'] == 1)
+        if($filterActive == 1)
             $whereCond .=' and s.Active = 1';
-        if($_POST['active'] == 2)
+        if($filterActive == 2)
             $whereCond .=' and s.Active = 2';
     }
-    if($_POST['feature'] > 0)
+    if($filterFeature > 0)
     {
-        if($_POST['feature'] ==1)
+        if($filterFeature ==1)
             $whereCond .=' and s.featured = 1';
-        if($_POST['feature'] == 0)
+        if($filterFeature == 0)
             $whereCond .=' and s.featured = 0';
     }
 

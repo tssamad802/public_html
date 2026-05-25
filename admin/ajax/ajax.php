@@ -15,14 +15,21 @@ $Return["Error"]=0;
 $Return["Redirect"]='';
 $Return["Focus"]='';
 
-if(isset($_SESSION[WEB_SESSION.'_userid']))
-{
-	$UserRecordGetting = FetchRecordByID($_SESSION[WEB_SESSION.'_userid'],"TableID","tblsystemusers"); 
-	$pagelimit = $UserRecordGetting['PerPageRecord'];
-	$CheckEvent = explode(",",$UserRecordGetting['EventID']);
-}
-else
-{
+$UserRecordGetting = [];
+$CheckEvent = [];
+
+if (isset($_SESSION[WEB_SESSION . '_userid']) && $_SESSION[WEB_SESSION . '_userid'] != '') {
+	$userRecord = FetchRecordByID($_SESSION[WEB_SESSION . '_userid'], "TableID", "tblsystemusers");
+	if (is_array($userRecord)) {
+		$UserRecordGetting = $userRecord;
+		$pagelimit = !empty($UserRecordGetting['PerPageRecord']) ? $UserRecordGetting['PerPageRecord'] : PAGE_LIMIT;
+		if (!empty($UserRecordGetting['EventID'])) {
+			$CheckEvent = explode(",", $UserRecordGetting['EventID']);
+		}
+	} else {
+		$pagelimit = PAGE_LIMIT;
+	}
+} else {
 	$pagelimit = PAGE_LIMIT;
 }
 

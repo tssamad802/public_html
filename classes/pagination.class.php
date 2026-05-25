@@ -1,7 +1,7 @@
 <?php
 /* Version 3: show some number of page links and takes care of query string*/
 class pagination {
-	var $full_sql, $per_page, $cur_page, $tot_pages, $offset;
+	var $full_sql, $per_page, $cur_page, $tot_pages, $offset, $refresh_div, $ajax_form;
 	
 	function __construct($full_sql, $per_page, $cur_page, $refresh_div, $ajax_form) {
 		global $dbPagination; //get db connection

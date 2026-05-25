@@ -118,8 +118,6 @@ $randomnumber = rand(100, 1000);
 
     <script src="dist/js/common.js"></script>
 
-    <script src="dist/js/init.js"></script>
-
     <script type="application/javascript">
     window.NoRecordFound = "<?php echo DSB_NO_RECORDS; ?>";
     </script>
@@ -262,110 +260,32 @@ $randomnumber = rand(100, 1000);
                                                 }
                                             }
                                             ?>
+                                                        <?php
+                                                            $masterLinkId = (int) $db->f('TableID');
+                                                            $sublinkTree = buildAdminNavSublinkTree($masterLinkId);
+                                                            $sublinkNavHtml = renderAdminNavSublinkTreeHtml($sublinkTree, $UserRecordGetting['TableID']);
+                                                            ?>
                                                         <li class="nav-item <?= $openmenuactiveclass ?>">
+                                                            <?php if ($sublinkNavHtml !== '') { ?>
                                                             <a class="nav-link" href="javascript:void(0);" data-toggle="collapse"
-                                                                data-target="#mainopen<?= $db->f(0) ?>" <?= $attopenattr ?>>
+                                                                data-target="#mainopen<?= $masterLinkId ?>" <?= $attopenattr ?>>
                                                                 <span class="feather-icon"><i data-feather="<?= $db->f(2) ?>"></i></span>
                                                                 <span class="nav-link-text"><?= $db->f('MenuName' . LANG_SEP_DB) ?></span>
                                                             </a>
+                                                            <?php } else { ?>
+                                                            <span class="nav-link">
+                                                                <span class="feather-icon"><i data-feather="<?= $db->f(2) ?>"></i></span>
+                                                                <span class="nav-link-text"><?= $db->f('MenuName' . LANG_SEP_DB) ?></span>
+                                                            </span>
+                                                            <?php } ?>
                                                             <?php
-                                                            // Sublink Query
-                                                            $SubLinkMenu = "Select * from tblsublinks where Active > 0 and MasterLinkID='" . $db->f(0) . "' and ParentID = 0 order By Sequence";
-                                                            $db1->query($SubLinkMenu);
-                                                            if ($db1->num_rows() > 0) {
+                                                            if ($sublinkNavHtml !== '') {
                                                                 ?>
-                                                                            <ul id="mainopen<?= $db->f(0) ?>"
+                                                                            <ul id="mainopen<?= $masterLinkId ?>"
                                                                                 class="nav flex-column collapse collapse-level-1 <?= $openmenuclass ?>">
                                                                                 <li class="nav-item">
                                                                                     <ul class="nav flex-column">
-                                                                                        <?php
-                                                                                        while ($db1->next_record()) {
-                                                                                            // echo "<script>console.log(" . json_encode($db1->Record) . ");</script>";
-                                                                                            if (CheckModulePermission($UserRecordGetting['TableID'], $db1->f('TableID'), "ViewPermissions") == 1) {
-                                                                                                $TableName = "";
-                                                                                                if ($db1->f('Active') == 1) {
-                                                                                                    $TableName = "&TableName=" . $db1->f('TableName');
-                                                                                                }
-                                                                                                $hrefvaribale = 'index.php?' . EncodeUrl('action=' . $db1->f('URL') . '&SubLinkID=' . $db1->f('TableID') . $TableName);
-                                                                                                $onclickvalue = '';
-
-                                                                                                if ($db1->f(0) == $_REQUEST['SubLinkID'])
-                                                                                                    $Selectedmenuclass = "active";
-                                                                                                else
-                                                                                                    $Selectedmenuclass = "";
-
-                                                                                                $SubLinkMenu = "Select * from tblsublinks where Active > 0 and MasterLinkID='" . $db->f(0) . "' and ParentID = '" . $db1->f(0) . "' order By Sequence";
-                                                                                                // echo "<script>console.log(" . json_encode($SubLinkMenu) . ");</script>";
-                                                                                                $db2->query($SubLinkMenu);
-                                                                                                if ($db2->num_rows() > 0) {
-                                                                                                    $attopenattr = '';
-                                                                                                    $openmenuclass = '';
-                                                                                                    $openmenuactiveclass = '';
-                                                                                                    if (isset($_REQUEST['SubLinkID'])) {
-                                                                                                        $Getparentid = getFieldDataByID("ParentID", "TableID", $_REQUEST['SubLinkID'], "tblsublinks");
-                                                                                                        if ($Getparentid == $db1->f(0)) {
-                                                                                                            $attopenattr = 'aria-expanded="true"';
-                                                                                                            $openmenuclass = 'show';
-                                                                                                            // $openmenuactiveclass = 'active';
-                                                                                                        }
-                                                                                                    }
-
-                                                                                                    ?>
-
-                                                                                                                                        <li class="nav-item <?= $openmenuactiveclass ?>">
-                                                                                                                                            <a class="nav-link" href="javascript:void(0);" data-toggle="collapse"
-                                                                                                                                                data-target="#subopen<?= $db1->f(0) ?>" <?= $attopenattr ?>>
-                                                                                                                                                <!--<span class="feather-icon"><i data-feather="<?= $db->f(2) ?>"></i></span>-->
-                                                                                                                                                <span class="nav-link-text"><?= $db1->f('LinkName' . LANG_SEP_DB) ?></span>
-                                                                                                                                            </a>
-                                                                                                                                            <ul id="subopen<?= $db1->f(0) ?>"
-                                                                                                                                                class="nav flex-column collapse collapse-level-1 <?= $openmenuclass ?>">
-                                                                                                                                                <li class="nav-item">
-                                                                                                                                                    <ul class="nav flex-column">
-                                                                                                                                                        <?php
-
-                                                                                                                                                        while ($db2->next_record()) {
-                                                                                                                                                            //echo "<script>console.log(" . json_encode($db2->Record) . ");</script>";
-                                                                                                                                                            if (CheckModulePermission($UserRecordGetting['TableID'], $db2->f('TableID'), "ViewPermissions") == 1) {
-                                                                                                                                                                $TableName = "";
-                                                                                                                                                                if ($db2->f('Active') == 1) {
-                                                                                                                                                                    $TableName = "&TableName=" . $db2->f('TableName');
-                                                                                                                                                                }
-                                                                                                                                                                $hrefvaribale = 'index.php?' . EncodeUrl('action=' . $db2->f('URL') . '&SubLinkID=' . $db2->f('TableID') . $TableName);
-                                                                                                                                                                $onclickvalue = '';
-
-
-                                                                                                                                                                if ($db2->f(0) == $_REQUEST['SubLinkID'])
-                                                                                                                                                                    $Selectedmenuclass = "active";
-                                                                                                                                                                else
-                                                                                                                                                                    $Selectedmenuclass = "";
-
-                                                                                                                                                                ?>
-                                                                                                                                                                                        <li class="nav-item <?= $Selectedmenuclass ?>">
-                                                                                                                                                                                            <a class="nav-link sublinktitle" href="<?= $hrefvaribale ?>"
-                                                                                                                                                                                                <?= $onclickvalue ?>><?= $db2->f('LinkName' . LANG_SEP_DB) ?></a>
-                                                                                                                                                                                        </li>
-                                                                                                                                                                        <?php }
-                                                                                                                                                        } ?>
-                                                                                                                                                    </ul>
-                                                                                                                                                </li>
-                                                                                                                                            </ul>
-
-                                                                                                                                        </li>
-
-                                                                                                                                        <?php
-                                                                                                } else {
-                                                                                                    ?>
-                                                                                                                                        <li class="nav-item <?= $Selectedmenuclass ?>">
-                                                                                                                                            <a class="nav-link" href="<?= $hrefvaribale ?>"
-                                                                                                                                                <?= $onclickvalue ?>><?= $db1->f('LinkName' . LANG_SEP_DB) ?></a>
-                                                                                                                                        </li>
-                                                                                                                                        <?php
-                                                                                                }
-                                                                                            }
-
-                                                                                        }
-                                                                                        ?>
+                                                                                        <?= $sublinkNavHtml ?>
                                                                                     </ul>
                                                                                 </li>
                                                                             </ul>

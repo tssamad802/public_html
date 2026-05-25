@@ -181,7 +181,8 @@ if (!isset($db)) {
                     <h3 class="widget-title text-dark">
                         Top Products
                     </h3>
-                    <div class="widget-widgets"> <a href="<?= RESOURCES_DOMAIN ?>/products">View More Products</a> </div>
+                    <div class="widget-widgets"> <a href="<?= RESOURCES_DOMAIN ?>/products">View More Products</a>
+                    </div>
                     <div class="clearfix"></div>
                 </div>
             </div>

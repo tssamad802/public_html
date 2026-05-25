@@ -10,6 +10,14 @@
 .hk-wrapper.hk-vertical-nav .hk-nav .navbar-nav .nav-item .nav-link[data-toggle="collapse"]::after {
 	margin-left:auto;
 }
+.hk-wrapper.hk-vertical-nav .hk-nav .navbar-nav .collapse.show,
+.hk-wrapper.hk-vertical-nav .hk-nav .navbar-nav .collapse.collapsing {
+	display: block;
+}
+.hk-wrapper.hk-vertical-nav.hk-nav-toggle .hk-nav:hover .navbar-nav .collapse.show,
+.hk-wrapper.hk-vertical-nav.hk-nav-toggle .hk-nav:hover .navbar-nav .collapse.collapsing {
+	display: block;
+}
 .hk-wrapper .hk-navbar .navbar-nav .nav-item.dropdown.dropdown-authentication .nav-link .media .media-img-wrap {
 	margin-right:10px;
 }

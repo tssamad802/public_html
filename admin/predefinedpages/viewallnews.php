@@ -199,22 +199,53 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
 {
 
 
-	$FetchData['Active'] = ACTIVE;
-	$Brief_Description_English=BRIEF_DESCRIPTION_LENGTH_ENGLISH;
-	$Brief_Description_Arabic=BRIEF_DESCRIPTION_LENGTH_ARABIC;
+	$RecordID = 0;
+	$FetchData = [
+		'Active' => ACTIVE,
+		'StoreID' => 0,
+		'CouponName' => '',
+		'description' => '',
+		'url' => '',
+		'landingLink' => '',
+		'trackingLink' => '',
+		'couponClassification' => 'code',
+		'couponCode' => '',
+		'logo' => '',
+		'BannerImage' => '',
+		'ShowHome' => 0,
+		'CategoryID' => '',
+		'CouponTypeID' => '',
+		'sitewide' => '',
+		'discount' => '',
+		'CouponTagID' => 0,
+		'storeDate' => '0000-00-00',
+		'startDate' => '',
+		'endDate' => '',
+		'upVotes' => '',
+		'downVotes' => '',
+		'featured' => 0,
+		'URLKeyword' => '',
+		'MetaTitle' => '',
+		'MetaDescription' => '',
+		'MetaKeywords' => '',
+		'BriefDescription' => '',
+		'BriefDescriptionAr' => '',
+	];
+	$Brief_Description_English = BRIEF_DESCRIPTION_LENGTH_ENGLISH;
+	$Brief_Description_Arabic = BRIEF_DESCRIPTION_LENGTH_ARABIC;
 	$RemoveData = 1;
-	if(isset($_REQUEST['RecordID']))
-	{
+	if (isset($_REQUEST['RecordID']) && $_REQUEST['RecordID'] != '') {
 		$RemoveData = 0;
-		checkPermission("EditPermissions",$UserRecordGetting['TableID'],$_REQUEST['SubLinkID']);
-		$RecordID = $_REQUEST['RecordID'];
-		$FetchData = FetchRecordByID($RecordID,"TableID","tblcoupon");
-		$Brief_Description_English=BRIEF_DESCRIPTION_LENGTH_ENGLISH-strlen(clearTextForField($FetchData['BriefDescription']));
-		$Brief_Description_Arabic=BRIEF_DESCRIPTION_LENGTH_ARABIC-strlen(clearTextForField($FetchData['BriefDescriptionAr']));
-	}
-	else
-	{
-		checkPermission("AddPermissions",$UserRecordGetting['TableID'],$_REQUEST['SubLinkID']);
+		checkPermission("EditPermissions", $UserRecordGetting['TableID'], $_REQUEST['SubLinkID']);
+		$RecordID = (int) $_REQUEST['RecordID'];
+		$fetchedRecord = FetchRecordByID($RecordID, "TableID", "tblcoupon");
+		if (is_array($fetchedRecord)) {
+			$FetchData = array_merge($FetchData, $fetchedRecord);
+		}
+		$Brief_Description_English = BRIEF_DESCRIPTION_LENGTH_ENGLISH - strlen(clearTextForField($FetchData['BriefDescription']));
+		$Brief_Description_Arabic = BRIEF_DESCRIPTION_LENGTH_ARABIC - strlen(clearTextForField($FetchData['BriefDescriptionAr']));
+	} else {
+		checkPermission("AddPermissions", $UserRecordGetting['TableID'], $_REQUEST['SubLinkID']);
 	}
 	?>
 
@@ -264,7 +295,7 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
                                     <div class="form-row">
                                         <div class="col-md-6 mb-10">
                                             <label > Coupon Name  <span>*</span></label>
-                                            <input type="text" name="CouponName" id="CouponName" onkeyup="<?=($FetchData['CouponName']!='') ? '' : 'BuildURL()'?>" class="form-control" value="<?=$FetchData['CouponName']?>" dir="ltr"  required />
+                                            <input type="text" name="CouponName" id="CouponName" onkeyup="<?= !empty($FetchData['CouponName']) ? '' : 'BuildURL()' ?>" class="form-control" value="<?= htmlspecialchars($FetchData['CouponName'], ENT_QUOTES, 'UTF-8') ?>" dir="ltr"  required />
                                             <div class="invalid-feedback">
                                                 <?=ERROR_TITLE_ENGLISH?>
                                             </div>
@@ -625,6 +656,45 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
 			setTimeout(function(){$('.singleDatePicker').val('');}, 500);
 		}
         </script>
+    <script>
+    const showCouponCode=() =>
+    {
+        if($('#couponClassification').val() == "offer") {
+            $('#couponCode').css('display', 'none');
+            $('#couponCodeAttr').removeAttr("required");
+        }
+        else {
+            $('#couponCode').css('display', 'block');
+            $('#couponCodeAttr').attr("required");
+        }
+    }
+    $('#sitewide').val('<?= htmlspecialchars($FetchData['sitewide'], ENT_QUOTES, 'UTF-8') ?>');
+    let url ;
+    const BuildURL = () => {
+        let name = $('#CouponName').val();
+        name = name.replaceAll(" ", "-");
+        $('#URLKeyword').val(name);
+        $('#url').val(url+"__"+name);
+    }
+
+    const getStoreDomain = () =>
+    {
+        let StoreID = $('#StoreID').val();
+        $.post('ajax/ajax_getStore.php' , {StoreID: StoreID} , function (data){
+            var n = data.lastIndexOf('.');
+            data = data.replaceAll('.', '-');
+            $('#url').val("<?=DOMAINNAME?>/stores/"+data+"");
+            url = $('#url').val();
+        })
+    }
+
+    <?php if (($FetchData['couponClassification'] ?? '') == "offer") { ?>
+    $('#couponClassification').val('<?= htmlspecialchars($FetchData['couponClassification'], ENT_QUOTES, 'UTF-8') ?>');
+    $('#couponCode').css('display', 'none');
+    $('#couponCode').val('');
+    $('#couponCodeAttr').removeAttr("required");
+    <?php } ?>
+    </script>
 
 
 
@@ -672,47 +742,6 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='PageVideo')
 ?>
     </div>
 </div>
-<script>
-    const showCouponCode=() =>
-    {
-        if($('#couponClassification').val() == "offer") {
-            $('#couponCode').css('display', 'none');
-            $('#couponCodeAttr').removeAttr("required");
-        }
-        else {
-            $('#couponCode').css('display', 'block');
-            $('#couponCodeAttr').attr("required");
-        }
-    }
-    $('#sitewide').val('<?=$FetchData['sitewide']?>');
-    let url ;
-    const BuildURL = () => {
-        let name = $('#CouponName').val();
-        // url = url.split(' ');
-        name = name.replaceAll(" ", "-");
-        $('#URLKeyword').val(name);
-        $('#url').val(url+"__"+name);
-    }
-
-    const getStoreDomain = () =>
-    {
-        let StoreID = $('#StoreID').val();
-        $.post('ajax/ajax_getStore.php' , {StoreID: StoreID} , function (data){
-            var n = data.lastIndexOf('.');
-            console.log(data.slice(n).replaceAll('.', '-'))
-            data = data.replaceAll('.', '-');
-            $('#url').val("<?=DOMAINNAME?>/stores/"+data+"");
-            url = $('#url').val();
-        })
-    }
-
-    <?php if($FetchData['couponClassification']=="offer"){ ?>
-    $('#couponClassification').val('<?=$FetchData['couponClassification']?>');
-    $('#couponCode').css('display', 'none');
-    $('#couponCode').val('');
-    $('#couponCodeAttr').removeAttr("required");
-    <?php } ?>
-</script>
 <script type="text/javascript">
     // Quick and simple export target #table_id into a csv
 function download_table_as_csv(table_id, separator = ',') {
