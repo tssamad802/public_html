@@ -89,18 +89,17 @@ if($db->num_rows() > 0)
 		echo '<div class="norecordfound">'.DSB_NO_RECORDS.'</div>';
 	}
 	
-	if($pagination->tot_pages > 1)
-	{
-		?>
-		<tr>
-			<td colspan="11">
-				<center>
-					  <?php echo $page_links;?>
-				</center>
-			</td>
-		</tr>
-		<?php
-	}
+	if (isset($pagination) && $pagination->tot_pages > 1) {
+    ?>
+    <tr>
+        <td colspan="11">
+            <center>
+                <?php echo $page_links; ?>
+            </center>
+        </td>
+    </tr>
+    <?php
+}
 }
 if(isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listinggallery')
 {

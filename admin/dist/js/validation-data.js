@@ -379,7 +379,7 @@ function SimpleAjax(pageUrl, FormId, divId) {
     //async: false,
     data: dataVar,
     success: function (msg) {
-		console.log(msg);
+		//console.log(msg);
       jQuery("#" + divId).empty();
       jQuery("#" + divId).html(msg);
       if ($("#datable_1").length > 0) {  
