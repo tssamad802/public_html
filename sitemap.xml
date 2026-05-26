@@ -86539,4 +86539,16 @@ https://grabdiscountcodes.com/tag/Halloween-Day-Coupons</loc>
     <lastmod>2025-11-10</lastmod>
     <priority>0.64</priority>
   </url>
+  <url>
+    <loc>http://localhost/public_html/store/trendymart</loc>
+    <changefreq>daily</changefreq>
+    <lastmod>2026-05-26</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>http://localhost/public_html/store/urbanstylehub</loc>
+    <changefreq>daily</changefreq>
+    <lastmod>2026-05-26</lastmod>
+    <priority>0.64</priority>
+  </url>
 </urlset>

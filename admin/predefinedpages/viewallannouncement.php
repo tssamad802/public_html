@@ -269,8 +269,41 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='SortRecord')
         }
 else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
 {
-
-    $FetchData['Active'] = ACTIVE;
+	$RecordID = 0;
+	$defaults = [
+		'TableID' => 0,
+		'name' => '',
+		'domain' => '',
+		'url' => '',
+		'storeDate' => '',
+		'webUrl' => '',
+		'trackingUrl' => '',
+		'Active' => ACTIVE,
+		'logo' => '',
+		'ShowHome' => 0,
+		'CountryID' => '',
+		'CategoryID' => '',
+		'H1' => '',
+		'H2' => '',
+		'NetworkID' => '',
+		'impressionCode' => '',
+		'discount' => '',
+		'fbUrl' => '',
+		'SimilarStoreID' => '',
+		'votes' => '',
+		'rating' => '',
+		'featured' => 0,
+		'storeAdd' => '',
+		'about' => '',
+		'description' => '',
+		'URLKeyword' => '',
+		'MetaTitle' => '',
+		'MetaDescription' => '',
+		'MetaKeywords' => '',
+		'BriefDescription' => '',
+		'BriefDescriptionAr' => ''
+	];
+	$FetchData = $defaults;
 	$Brief_Description_English=BRIEF_DESCRIPTION_LENGTH_ENGLISH;
 	$Brief_Description_Arabic=BRIEF_DESCRIPTION_LENGTH_ARABIC;
 	$RemoveData = 1;
@@ -279,7 +312,11 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
 		$RemoveData = 0;
 		checkPermission("EditPermissions",$UserRecordGetting['TableID'],$_REQUEST['SubLinkID']);
 		$RecordID = $_REQUEST['RecordID'];
-		$FetchData = FetchRecordByID($RecordID,"TableID","tblstore");
+		$dbRow = FetchRecordByID($RecordID,"TableID","tblstore");
+		if(is_array($dbRow))
+		{
+			$FetchData = array_merge($defaults, $dbRow);
+		}
 		$Brief_Description_English=BRIEF_DESCRIPTION_LENGTH_ENGLISH-strlen(clearTextForField($FetchData['BriefDescription']));
 		$Brief_Description_Arabic=BRIEF_DESCRIPTION_LENGTH_ARABIC-strlen(clearTextForField($FetchData['BriefDescriptionAr']));
 	}

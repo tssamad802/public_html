@@ -611,20 +611,20 @@ else if ($ActionFlag == 'AddEditSystemUser') {
 
 		$Query .= "RoleID='" . secureTextForDb($_POST['RoleID']) . "',
 					FullName='" . secureTextForDb($_POST['FullName']) . "', 
-					FullNameAr='" . secureTextForDb($_POST['FullNameAr']) . "' , 
+					FullNameAr='" . secureTextForDb($_POST['FullNameAr'] ?? '') . "' , 
 					Email='" . secureTextForDb($_POST['Email']) . "' , 
-					EmpNo='" . secureTextForDb($_POST['EmpNo']) . "' , 
-					MobileNo='" . secureTextForDb($_POST['MobileNo']) . "' , 
-					EventID='" . implode(",", $_POST['EventID']) . "' ,  
-					PerPageRecord='" . secureTextForDb($_POST['PerPageRecord']) . "' , 
+					EmpNo='" . secureTextForDb($_POST['EmpNo'] ?? '') . "' , 
+					MobileNo='" . secureTextForDb($_POST['MobileNo'] ?? '') . "' , 
+					EventID='" . (isset($_POST['EventID']) && is_array($_POST['EventID']) ? implode(",", $_POST['EventID']) : '') . "' ,  
+					PerPageRecord='" . secureTextForDb($_POST['PerPageRecord'] ?? 500) . "' , 
 					Active='" . secureTextForDb($_POST['Active']) . "',   
 					BlockBy='0'   
 				   ";
 
-		if ($_POST['UserName'] != '' && $Trigger != 'edit')
+		if (($_POST['UserName'] ?? '') != '' && $Trigger != 'edit')
 			$Query .= " , UserName = '" . secureTextForDb($_POST['UserName']) . "' ";
 
-		if ($_POST['Password'] != '')
+		if (($_POST['Password'] ?? '') != '')
 			$Query .= " , Password = '" . secureTextForDb($Password) . "' ";
 
 		if ($Trigger == 'edit')
@@ -1913,19 +1913,26 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 	echo json_encode($result);
 } else if ($ActionFlag == 'AddEditCoupon') {
 	$TableName = "tblcoupon";
-	if (isset($_POST['URLKeyword']))
+	$URLKeywordDublicate = 0;
+	if (isset($_POST['URLKeyword']) && $_POST['URLKeyword'] != '')
 		$URLKeywordDublicate = getFieldDataByID("TableID", "URLKeyword", $_POST['URLKeyword'], $TableName);
 
-	if (in_array($_FILES['logo']['type'], $AllowedImageExtension) && $_FILES['logo']['type'] != '') {
-		$BannerImageWidth = getWidth($_FILES['logo']['tmp_name']);
-		$BannerImageHeight = getHeight($_FILES['logo']['tmp_name']);
+	$logoType = $_FILES['logo']['type'] ?? '';
+	$logoTmpName = $_FILES['logo']['tmp_name'] ?? '';
+	$BannerImageWidth = 0;
+	$BannerImageHeight = 0;
+	if (in_array($logoType, $AllowedImageExtension) && $logoType != '') {
+		$BannerImageWidth = getWidth($logoTmpName);
+		$BannerImageHeight = getHeight($logoTmpName);
 	}
+
+	$thumbnailType = $_FILES['ThumbnailImage']['type'] ?? '';
 
 	if ($URLKeywordDublicate > 0 && $RecordID != $URLKeywordDublicate && $Trigger == 'edit') {
 		//		$result['error'] = ERROR_PAGE_URL;
-	} else if (!in_array($_FILES['logo']['type'], $AllowedImageExtension) && $_FILES['logo']['type'] != '') {
+	} else if (!in_array($logoType, $AllowedImageExtension) && $logoType != '') {
 		$result['error'] = ERROR_PAGE_BANNER_CHOOSE;
-	} else if (!in_array($_FILES['ThumbnailImage']['type'], $AllowedImageExtension) && $_FILES['ThumbnailImage']['type'] != '') {
+	} else if (!in_array($thumbnailType, $AllowedImageExtension) && $thumbnailType != '') {
 		$result['error'] = ERROR_THUMBNAIL_IMAGE_CHOOSE;
 	} else if ($BannerImageWidth > 0 && ($BannerImageWidth != INNER_PAGE_BANNER_WIDTH || $BannerImageHeight != INNER_PAGE_BANNER_HEIGHT)) {
 		// $result['error'] = ERROR_PAGE_BANNER_WIDTH_HEIGHT.INNER_PAGE_BANNER_WIDTH."x".INNER_PAGE_BANNER_HEIGHT;
@@ -1941,45 +1948,45 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 			$Sequence = maxID("Sequence", $TableName, 1);
 			$Query = "insert into $TableName set  Sequence=$Sequence , ";
 			$logaction = 1;
-			$_POST['MetaTitle'] = ($_POST['MetaTitle'] == "") ? $_POST['Title'] : $_POST['MetaTitle'];
-			$_POST['MetaTitleAr'] = ($_POST['MetaTitleAr'] == "") ? $_POST['TitleAr'] : $_POST['MetaTitleAr'];
+			$_POST['MetaTitle'] = (($_POST['MetaTitle'] ?? '') == "") ? ($_POST['Title'] ?? '') : $_POST['MetaTitle'];
+			$_POST['MetaTitleAr'] = (($_POST['MetaTitleAr'] ?? '') == "") ? ($_POST['TitleAr'] ?? '') : $_POST['MetaTitleAr'];
 
 			// 			sitemap($_POST['url'], date('Y-m-d'), '0.64');
 		}
 
 		$ShowHome = 0;
-		if ($_POST['ShowHome'] == 1) {
+		if (($_POST['ShowHome'] ?? 0) == 1) {
 			$ShowHome = 1;
 		}
 
-		$Query .= "CouponName='" . secureTextForDb($_POST['CouponName']) . "',
-					url='" . secureTextForDb($_POST['url']) . "',  
-					trackingLink='" . secureTextForDb($_POST['trackingLink']) . "', 
-					landingLink='" . secureTextForDb($_POST['landingLink']) . "' ,  
-					webUrl='" . secureTextForDb($_POST['webUrl']) . "' ,  
-					Active='" . secureTextForDb($_POST['Active']) . "' ,   
+		$Query .= "CouponName='" . secureTextForDb($_POST['CouponName'] ?? '') . "',
+					url='" . secureTextForDb($_POST['url'] ?? '') . "',  
+					trackingLink='" . secureTextForDb($_POST['trackingLink'] ?? '') . "', 
+					landingLink='" . secureTextForDb($_POST['landingLink'] ?? '') . "' ,  
+					webUrl='" . secureTextForDb($_POST['webUrl'] ?? '') . "' ,  
+					Active='" . secureTextForDb($_POST['Active'] ?? '') . "' ,   
 					ShowHome='" . secureTextForDb($ShowHome) . "' ,    
-					CouponTagID='" . secureTextForDb($_POST['CouponTagID']) . "' ,  
-					startDate='" . secureTextForDb($_POST['startDate']) . "' , 
-					endDate='" . secureTextForDb($_POST['endDate']) . "' ,  
-					StoreID='" . secureTextForDb($_POST['StoreID']) . "' ,  
-					upVotes='" . secureTextForDb($_POST['upVotes']) . "' , 
-					downVotes='" . secureTextForDb($_POST['downVotes']) . "' , 
-					featured='" . secureTextForDb($_POST['featured']) . "' ,  
-					sitewide='" . secureTextForDb($_POST['sitewide']) . "' ,
-					couponCode='" . secureTextForDb($_POST['couponCode']) . "' ,
-					discount='" . secureTextForDb($_POST['discount']) . "' ,  
-					couponClassification='" . secureTextForDb($_POST['couponClassification']) . "' ,
-					CategoryID='" . secureTextForDb(implode(",", $_POST['CategoryID'])) . "' ,
-					CouponTypeID='" . secureTextForDb(implode(",", $_POST['CouponTypeID'])) . "' ,
-					MetaTitle='" . secureTextForDb($_POST['MetaTitle']) . "' ,
-					MetaKeywords='" . secureTextForDb($_POST['MetaKeywords']) . "' ,
-					MetaDescription='" . secureTextForDb($_POST['MetaDescription']) . "' ,
-					description='" . secureTextForDb($_POST['description']) . "'    
+					CouponTagID='" . secureTextForDb($_POST['CouponTagID'] ?? '') . "' ,  
+					startDate='" . secureTextForDb($_POST['startDate'] ?? '') . "' , 
+					endDate='" . secureTextForDb($_POST['endDate'] ?? '') . "' ,  
+					StoreID='" . secureTextForDb($_POST['StoreID'] ?? '') . "' ,  
+					upVotes='" . secureTextForDb($_POST['upVotes'] ?? 0) . "' , 
+					downVotes='" . secureTextForDb($_POST['downVotes'] ?? 0) . "' , 
+					featured='" . secureTextForDb($_POST['featured'] ?? 0) . "' ,  
+					sitewide='" . secureTextForDb($_POST['sitewide'] ?? '') . "' ,
+					couponCode='" . secureTextForDb($_POST['couponCode'] ?? '') . "' ,
+					discount='" . secureTextForDb($_POST['discount'] ?? '') . "' ,  
+					couponClassification='" . secureTextForDb($_POST['couponClassification'] ?? '') . "' ,
+					CategoryID='" . secureTextForDb(implode(",", $_POST['CategoryID'] ?? [])) . "' ,
+					CouponTypeID='" . secureTextForDb(implode(",", $_POST['CouponTypeID'] ?? [])) . "' ,
+					MetaTitle='" . secureTextForDb($_POST['MetaTitle'] ?? '') . "' ,
+					MetaKeywords='" . secureTextForDb($_POST['MetaKeywords'] ?? '') . "' ,
+					MetaDescription='" . secureTextForDb($_POST['MetaDescription'] ?? '') . "' ,
+					description='" . secureTextForDb($_POST['description'] ?? '') . "'    
 				   ";
 
-		if ($_POST['URLKeyword'] == '') {
-			$URLKeyword = $_POST['URLKeyword'];
+		if (($_POST['URLKeyword'] ?? '') == '') {
+			$URLKeyword = $_POST['URLKeyword'] ?? '';
 			$URLKeyword = SEOFriendlyURL($URLKeyword);
 
 			$URLKeyword = SEOFriendlyPageURL($URLKeyword, $URLKeyword, $TableName);
@@ -1992,15 +1999,17 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 			$Query .= " , URLKeyword = '" . secureTextForDb($URLKeyword) . "' ";
 
 
-		$tmpBannerImage = $_FILES['logo']['tmp_name'];
-		$FileNameBanner = date("YmdHis") . '-' . rand(0, 1000);
-		$UploadBannerImage = $FileNameBanner . makeExtention($_FILES['logo']['type']);
-		$FileNameBannerImage = '../' . FILES_FOLDER . '/' . BANNER_FOLDER . '/' . $UploadBannerImage;
-		$FileNameBannerImageCrop = '../' . FILES_FOLDER . '/' . BANNER_FOLDER . '/' . $UploadBannerImage;
+		if (isset($_FILES['logo']['tmp_name']) && $_FILES['logo']['tmp_name'] != '') {
+			$tmpBannerImage = $_FILES['logo']['tmp_name'];
+			$FileNameBanner = date("YmdHis") . '-' . rand(0, 1000);
+			$UploadBannerImage = $FileNameBanner . makeExtention($logoType);
+			$FileNameBannerImage = '../' . FILES_FOLDER . '/' . BANNER_FOLDER . '/' . $UploadBannerImage;
+			$FileNameBannerImageCrop = '../' . FILES_FOLDER . '/' . BANNER_FOLDER . '/' . $UploadBannerImage;
 
-		if (move_uploaded_file($_FILES['logo']['tmp_name'], $FileNameBannerImage)) {
-			$Query .= " , logo = '" . secureTextForDb($UploadBannerImage) . "' ";
-			//			CropimageSave($_POST['ImageCropData1'],$FileNameBannerImageCrop);
+			if (move_uploaded_file($tmpBannerImage, $FileNameBannerImage)) {
+				$Query .= " , logo = '" . secureTextForDb($UploadBannerImage) . "' ";
+				//			CropimageSave($_POST['ImageCropData1'],$FileNameBannerImageCrop);
+			}
 		}
 
 
@@ -2024,13 +2033,13 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 		}
 
 
-		foreach ($_POST['CategoryID'] as $a) {
+		foreach (($_POST['CategoryID'] ?? []) as $a) {
 			$sql = "insert into tblcouponcategory set  CouponID='" . secureTextForDb($InsertRecordID) . "',
 				CategoryID='" . secureTextForDb($a) . "';";
 			$db->query($sql);
 		}
 
-		foreach ($_POST['CouponTypeID'] as $a) {
+		foreach (($_POST['CouponTypeID'] ?? []) as $a) {
 			$sql = "insert into tblcouponstypes set  CouponID='" . secureTextForDb($InsertRecordID) . "',
 				CouponTypeID='" . secureTextForDb($a) . "';";
 			$db->query($sql);
@@ -2039,7 +2048,7 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 
 		// Get Store Category here
 
-		if (count($_POST['CategoryID']) != "") {
+		if (isset($_POST['StoreID']) && $_POST['StoreID'] != '' && count($_POST['CategoryID'] ?? []) > 0) {
 			$sql = "select * from tblstorecategory where StoreID = " . $_POST['StoreID'];
 			$db->query($sql);
 			while ($db->next_Record()) {

@@ -126,9 +126,8 @@ if( $_REQUEST['actions']=="storeHomelisting")
 
     // $queryproduct = "select * from tblstore where ";
 $whereCond = ' s.ShowHome = 1 and s.active!=2 ';
-$queryproduct = "SELECT * ,s.Active active ,s.URLKeyword, s.`TableID` AS id , n.Title as NetName FROM tblstore s 
+$queryproduct = "SELECT s.*, s.trackingUrl AS trackingLink, s.Active active, s.URLKeyword, s.TableID AS id, n.Title as NetName FROM tblstore s 
 INNER JOIN `tblcountry` c ON (s.`CountryID` = c.`TableID`) 
-INNER JOIN `tbluserregistration_log` u ON (u.`TableID` = s.`CreatedBy`) 
 INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where  $whereCond order by name ASC limit 12";
     $db->query($queryproduct);
     $rowcount = $db->num_rows();
@@ -143,10 +142,10 @@ INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where  $whereCond order
         while($db->next_record()){
             ?>
             <!--<div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 thumb">-->
-            <div class="col-lg-2 col-md-2 col-sm-2 thumb>
+            <div class="col-lg-2 col-md-2 col-sm-2 thumb">
                 <div class="thumb-inside">
                     <a class="thumbnail" href="<?= RESOURCES_DOMAIN.'/'.STORE_URL.'/'.$db->f('URLKeyword')?>" aria-label="navigate to categories page" >
-                        <img class="img-small" src="files/banners/<?=$db->f('logo')?>"" alt="categories image ">
+                        <img class="img-small" src="files/banners/<?=$db->f('logo')?>" alt="categories image ">
                     </a> 
                  <div class="store_name text-center">
                     <a href="<?=$db->f('trackingLink')?>" aria-label="go to categories"><h4 style="font-weight: bold"><?=$db->f('name')?></h4></a>
