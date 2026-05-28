@@ -1,4 +1,5 @@
 <?php
-if($_REQUEST['q']){
-    echo $_REQUEST['q'];
+$q = $_REQUEST['q'] ?? '';
+if($q){
+    echo $q;
 }

@@ -4,8 +4,9 @@ include_once("../classes/ajaxpagination.class.php");
 $whereCond = '';
 $q = isset($_REQUEST['q']) ? $_REQUEST['q'] : '';
 $Active = isset($_REQUEST['Active']) ? $_REQUEST['Active'] : ''; 
+$actions = $_REQUEST['actions'] ?? '';
 
-if($_REQUEST['actions'] == "storelisting")
+if($actions == "storelisting")
 {
 	$perPage = new PerPage();
 	$page = 1;

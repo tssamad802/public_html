@@ -8,11 +8,14 @@
 include_once("ajax.php");
 include_once("../classes/ajaxpagination.class.php");
 $whereCond = '';
-$q = $_REQUEST['q'];
-$Active = $_REQUEST['Active'];
-if($_REQUEST['actions'] == "couponlisting")
+$q = $_REQUEST['q'] ?? '';
+$Active = $_REQUEST['Active'] ?? '';
+$actions = $_REQUEST['actions'] ?? '';
+$data = $_REQUEST['data'] ?? '';
+if($actions == "couponlisting")
 {
     $perPage = new PerPage();
+    $pagelimit = $perPage->perpage;
     $page = 1;
     if(!empty($_REQUEST["page"])) {
         $page = $_REQUEST["page"];
@@ -23,7 +26,7 @@ if($_REQUEST['actions'] == "couponlisting")
                                                 INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)
                                                 INNER JOIN  `tblcoupontype` ctype ON ( ctype.`TableID` = c.`CouponTypeID` )
                                                 INNER JOIN  `tblcoupontag` ctag ON ( ctag.`TableID` = c.`CouponTagID` )
-                                                 WHERE c.Active = 1 and ctag.URLKeyword = '".$_REQUEST['data']."'"; //c.endDate >= CURDATE() INNER JOIN `tblcoupontag` ctag ON (ctag.`TableID` = c.`CouponTagID`)
+                                                 WHERE c.Active = 1 and ctag.URLKeyword = '".secureTextForDb($data)."'"; //c.endDate >= CURDATE() INNER JOIN `tblcoupontag` ctag ON (ctag.`TableID` = c.`CouponTagID`)
     $db->query($queryproduct);
     $rowcount = $db->num_rows();
     $queryproduct =  $queryproduct . " limit " . $start . "," . $perPage->perpage;

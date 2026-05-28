@@ -101,7 +101,7 @@ if($db->num_rows() > 0)
 		echo '<div class="norecordfound">'.DSB_NO_RECORDS.'</div>';
 	}
 	
-	if($pagination->tot_pages > 1)
+	if(isset($pagination) && $pagination->tot_pages > 1)
 	{
 		?>
 		<tr>

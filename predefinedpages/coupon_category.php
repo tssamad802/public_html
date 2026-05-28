@@ -2,7 +2,9 @@
 
 $db = new DB_Sql();
 $db1 = new DB_Sql();
-$sql = "select * from tblpages where URLKeyword = '".$_REQUEST['url']."'";
+$requestUrl = $_REQUEST['url'] ?? '';
+$Description = '';
+$sql = "select * from tblpages where URLKeyword = '".secureTextForDb($requestUrl)."'";
 
 $db->query($sql);
 $Category = "";
@@ -10,14 +12,14 @@ while($db->next_record()){
     $Description = $db->f('description');
     $Category = $db->f('Title');
 }
-$Query ="select * from tblcategory where URLKeyword = '".$_REQUEST['url']."'";
+$Query ="select * from tblcategory where URLKeyword = '".secureTextForDb($requestUrl)."'";
 $db->query($Query);
 while($db->next_record())
 {
     $Category = $db->f('Title');
 }
 
-$query = "select * from `tblcategory` where `URLKeyword` = '".$_REQUEST['url']."';";
+$query = "select * from `tblcategory` where `URLKeyword` = '".secureTextForDb($requestUrl)."';";
                 $db->query($query);
                 $TableID = 0;
                 while ($db->next_record()) {
@@ -101,7 +103,7 @@ $query = "select * from `tblcategory` where `URLKeyword` = '".$_REQUEST['url']."
 </section>
 <script>
     <?php
-        $data = ($_REQUEST['url'] == "") ? "" : $_REQUEST['url'];
+        $data = $requestUrl;
     ?>
     SimpleAjax('<?php echo RESOURCES_DOMAIN;?>/ajax/ajax_coupon_category.php?actions=couponlisting&data=<?=$data?>&page=0','searchfrm','resultDiv');
     SimpleAjax('<?php echo RESOURCES_DOMAIN;?>/ajax/ajax_coupon_category.php?actions=relatedProduct&data=<?=$data?>&page=0','searchfrm','resultDiv1');

@@ -238,7 +238,7 @@ if (isset($_REQUEST['option']) && $_REQUEST['option'] != '') {
             else
                 $CURRENT_ACTIVE_INDEX = ($objNav->f("ParentTableID") > 0) ? $objNav->f("ParentTableID") : $objNav->f("TableID");
 
-            $physiclapage = $PageTypeArPages[$objNav->f("PageType")];
+            $physiclapage = $PageTypeArPages[$objNav->f("PageType")] ?? '';
 
             if ($physiclapage != '') {
                 $currentpage = "predefinedpages/" . $physiclapage;

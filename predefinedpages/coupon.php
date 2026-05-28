@@ -2,7 +2,7 @@
     $db= new DB_Sql();
     $url = $_REQUEST['url'] ?? '';
     $text = '';
-$Query="SELECT * FROM `tblcoupontype` WHERE `URLKeyword` = '$url'";
+$Query="SELECT * FROM `tblcoupontype` WHERE `URLKeyword` = '".secureTextForDb($url)."'";
 $db->query($Query);
 while ($db->next_record()) {
     $text = $db->f('Title');
@@ -36,7 +36,7 @@ while ($db->next_record()) {
 </section>
 <script>
     <?php
-        $data = ($_REQUEST['url'] == "") ? "" : $_REQUEST['url'];
+        $data = $url;
     ?>
     SimpleAjax('<?php echo RESOURCES_DOMAIN;?>/ajax/ajax_coupon.php?actions=couponlisting&data=<?=$data?>&page=0','searchfrm','resultDiv');
     SimpleAjax('<?php echo RESOURCES_DOMAIN;?>/ajax/ajax_coupon.php?actions=relatedProduct&url=<?=$data?>&page=0','searchfrm','resultDiv1');

@@ -5,9 +5,11 @@
     include_once("ajax.php");
     include_once("../classes/ajaxpagination.class.php");
     $whereCond = '';
-    $q = $_REQUEST['q'];
-    $Active = $_REQUEST['Active'];
-    if($_REQUEST['actions'] == "couponlisting")
+    $q = $_REQUEST['q'] ?? '';
+    $Active = $_REQUEST['Active'] ?? '';
+    $actions = $_REQUEST['actions'] ?? '';
+    $data = $_REQUEST['data'] ?? '';
+    if($actions == "couponlisting")
     {
     $perPage = new PerPage();
     $page = 1;
@@ -15,7 +17,7 @@
         $page = $_REQUEST["page"];
     }
     $whereCond = "WHERE c.Active != 2 and c.endDate < CURDATE()";
-    $whereCond .= ($_REQUEST['data'] == "") ? "" : "and ctype.URLKeyword = '".$_REQUEST['data']."'";
+    $whereCond .= ($data == "") ? "" : " and ctype.URLKeyword = '".secureTextForDb($data)."'";
     $start = ($page-1)*$perPage->perpage;
     if($start < 0) $start = 0;
     $queryproduct="SELECT c.TableID as TableID, c.description description, s.logo logo ,c.discount discount ,s.trackingUrl as storeTracking , c.featured as featured , c.endDate as endDate , ctype.Title as coponType , c.CouponName as name , c.`TableID` AS id , c.couponCode as code , c.trackingLink as trackURL , c.description as Description ,c.sitewide as sitewide FROM `tblcoupon` c

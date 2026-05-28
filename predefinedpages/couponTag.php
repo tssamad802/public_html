@@ -1,10 +1,14 @@
 <?php
 $db= new DB_Sql();
 $db1= new DB_Sql();
+$requestUrl = $_REQUEST['url'] ?? '';
+$Name = '';
+$Description = '';
+$days = 0;
 
 //echo $_REQUEST['url'].'<br/>';
 
-$queryproduct="SELECT * from tblcoupontag where URLKeyword = '".$_REQUEST['url']."'";
+$queryproduct="SELECT * from tblcoupontag where URLKeyword = '".secureTextForDb($requestUrl)."'";
 $db->query($queryproduct);
 while($db->next_record()){
     $Name = $db->f('Title');
@@ -15,7 +19,7 @@ while($db->next_record()){
 
 //echo $TagDate.'<br/>';
 
-$sql = "SELECT DATEDIFF( CURDATE(), `tagDate` ) as days FROM `tblcoupontag`  WHERE Active = 1 and URLKeyword = '".$_REQUEST['url']."'";
+$sql = "SELECT DATEDIFF( CURDATE(), `tagDate` ) as days FROM `tblcoupontag`  WHERE Active = 1 and URLKeyword = '".secureTextForDb($requestUrl)."'";
 
 //echo $sql;
 
@@ -56,7 +60,7 @@ while($db1->next_record()){
 </section>
 <script>
     <?php
-        $Title = $_REQUEST['url'];
+        $Title = $requestUrl;
     ?>
     SimpleAjax('<?php echo RESOURCES_DOMAIN;?>/ajax/ajax_tag.php?actions=couponlisting&data=<?=$Title?>&page=0','searchfrm','resultDiv');
 </script>

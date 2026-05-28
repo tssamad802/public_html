@@ -1,6 +1,7 @@
 <?php
 require_once 'ajax.php';
 $userTableId = (is_array($UserRecordGetting) && isset($UserRecordGetting['TableID'])) ? (int) $UserRecordGetting['TableID'] : 2; $userTableId = 2;
+// echo "<script>alert(" . json_encode("User Table ID: " . $userTableId) . ");</script>";
 $subLinkId = isset($_REQUEST['SubLinkID']) ? (int) $_REQUEST['SubLinkID'] : 0;
 $CheckDeletePermissioon = $userTableId ? CheckModulePermission($userTableId, $subLinkId, "DeletePermissions") : 0;
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
@@ -8,32 +9,35 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
     $whereCond = '';
     $filterActive = isset($_POST['active']) ? (int) $_POST['active'] : -1;
     $filterFeature = isset($_POST['feature']) ? (int) $_POST['feature'] : -1;
+    $postValue = function ($key, $default = '') {
+        return $_POST[$key] ?? $default;
+    };
     
 
-    if ($_POST['CouponName'] != '') {
-        $whereCond .= ' and c.CouponName LIKE "%' . $_POST['CouponName'] . '%"';
+    if ($postValue('CouponName') != '') {
+        $whereCond .= ' and c.CouponName LIKE "%' . secureTextForDb($postValue('CouponName')) . '%"';
     }
 
-    if ($_POST['StoreID'] > 0) {
-        $whereCond .= ' and c.StoreID = "' . $_POST['StoreID'] . '"';
+    if ((int) $postValue('StoreID', 0) > 0) {
+        $whereCond .= ' and c.StoreID = "' . (int) $postValue('StoreID') . '"';
     }
-    if ($_POST['url'] != "") {
-        $whereCond .= ' and c.url = "' . $_POST['url'] . '"';
+    if ($postValue('url') != "") {
+        $whereCond .= ' and c.url = "' . secureTextForDb($postValue('url')) . '"';
     }
-    if ($_POST['discount'] != "") {
-        $whereCond .= ' and c.discount = "' . $_POST['discount'] . '"';
+    if ($postValue('discount') != "") {
+        $whereCond .= ' and c.discount = "' . secureTextForDb($postValue('discount')) . '"';
     }
-    if ($_POST['endDate'] != "") {
-        $whereCond .= ' and c.endDate = "' . $_POST['endDate'] . '"';
+    if ($postValue('endDate') != "") {
+        $whereCond .= ' and c.endDate = "' . secureTextForDb($postValue('endDate')) . '"';
     }
-    if ($_POST['startDate'] != "") {
-        $whereCond .= ' and c.startDate = "' . $_POST['startDate'] . '"';
+    if ($postValue('startDate') != "") {
+        $whereCond .= ' and c.startDate = "' . secureTextForDb($postValue('startDate')) . '"';
     }
-    if ($_POST['CreatedBy'] > 0) {
-        $whereCond .= ' and c.CreatedBy = "' . $_POST['CreatedBy'] . '"';
+    if ((int) $postValue('CreatedBy', 0) > 0) {
+        $whereCond .= ' and c.CreatedBy = "' . (int) $postValue('CreatedBy') . '"';
     }
-    if ($_POST['ModifiedBy'] > 0) {
-        $whereCond .= ' and c.ModifiedBy = "' . $_POST['ModifiedBy'] . '"';
+    if ((int) $postValue('ModifiedBy', 0) > 0) {
+        $whereCond .= ' and c.ModifiedBy = "' . (int) $postValue('ModifiedBy') . '"';
     }
     if ($filterActive > -1) {
         if ($filterActive == 0)
@@ -43,7 +47,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
         if ($filterActive == 2)
             $whereCond .= ' and c.Active = 2';
     }
-    if ($filterFeature > 0) {
+    if ($filterFeature > -1) {
         if ($filterFeature == 1)
             $whereCond .= ' and c.featured = 1';
         if ($filterFeature == 0)
@@ -65,6 +69,7 @@ s.name AS storeName
 FROM tblcoupon c
 INNER JOIN tblstore s ON (c.StoreID = s.TableID)
 INNER JOIN tblsystemusers u ON (u.TableID = c.CreatedBy)
+WHERE 1 $whereCond
 ORDER BY s.name, c.Sequence";   // No semicolon here
     // echo $sql;
     // exit;
@@ -121,7 +126,7 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
                                                                         <td align="center"><?= onlydateshortformat($db->f('startDate')) ?></td>
                                                                         <td align="center"><?= onlydateshortformat($db->f('endDate')) ?></td>
 
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="c<?= $db->f('id') ?>" onclick="UpdateCouponActive('<?= $Status ?>' , <?= $db->f('id') ?>)"><?= $Status ?></span></td>
+                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="c<?= $db->f('id') ?>" onclick="UpdateCouponActive(<?= json_encode($Status) ?>, <?= (int) $db->f('id') ?>)"><?= $Status ?></span></td>
                                                                         <td align="center"><?= $db->f('FullName') ?></td>
 
                                                                         <td align="center">
@@ -549,7 +554,7 @@ ORDER BY s.name ASC;";
                                                                     <td align="center"><?= $row['NetName'] ?></td>
                                                                     <td align="center"><?= ($row['logo'] != null) ? "Yes" : "No" ?></td>
                                                                     <td align="center">
-                                                                        <span id="<?= $row['id'] ?>" class="badge <?= $StatusClass ?>" onclick="UpdateActive('<?= $Status ?>', <?= $row['id'] ?>)">
+                                                                        <span id="<?= (int) $row['id'] ?>" class="badge <?= $StatusClass ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $row['id'] ?>)">
                                                                             <?= $Status ?>
                                                                         </span>
                                                                     </td>
@@ -846,7 +851,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingslider'
                                                                         <td align="left"><?= $db->f('couponCode') ?></td>
                                                             <!--            <td align="center" class=""><span class="badge --><?//=$StatusClass ?><!--">--><?//=$Status ?><!--</span></td>-->
                                                             <!--            <td align="center">-->
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="<?= $db->f('TableID') ?>" onclick="UpdateActive('<?= $Status ?>' , <?= $db->f('TableID') ?> , '<?= $_REQUEST['TableName'] ?>')"><?= $Status ?></span></td>
+                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="<?= (int) $db->f('TableID') ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $db->f('TableID') ?>, <?= json_encode($_REQUEST['TableName'] ?? $TableName) ?>)"><?= $Status ?></span></td>
 
                                                                         <!--           	 <a href="//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=PageGallery&ParentID=".$db->f('TableID')."&TypeID=".COURSE_MEDIA_TYPE."&TableName=".$TableName)?>" class="iconhoverbox" > <i class="icon-link"></i> </a>-->
                                                             <!--            </td>-->
@@ -1419,4 +1424,3 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingcampaig
 } ?>
 
  
-

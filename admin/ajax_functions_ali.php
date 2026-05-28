@@ -1,6 +1,7 @@
 <?php
 // add master form
-
+if (false) {
+}
 
 else if($ActionFlag == 'AddEditNews')
 {

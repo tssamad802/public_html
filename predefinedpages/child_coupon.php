@@ -1,7 +1,9 @@
 <?php
 
 $db = new DB_Sql();
-$sql = "select * from tblpages where URLKeyword = '".$_REQUEST['url']."'";
+$requestUrl = $_REQUEST['url'] ?? '';
+$Description = '';
+$sql = "select * from tblpages where URLKeyword = '".secureTextForDb($requestUrl)."'";
 
 
 $db->query($sql);
@@ -17,7 +19,7 @@ while($db->next_record()){
         <div class="container">
             <div class="row">
                 <div class="col-lg-9 col-md-9">
-                    <h4>Category : <?=$_REQUEST['url']?></h4>
+                    <h4>Category : <?=$requestUrl?></h4>
                     <p><?=$Description?></p>
                 </div>
             </div>
@@ -44,7 +46,7 @@ while($db->next_record()){
                 $query = "SELECT cc.featured , cc.TableID TableID  , cc.logo ,cc.CouponName name , cc.endDate as expire , cc.description Description
                             FROM `tblcategory` c INNER JOIN `tblcouponcategory` tc ON (c.`TableID`=tc.`CategoryID`) 
                             INNER JOIN `tblcoupon` cc ON (tc.`CouponID` = cc.Tableid) INNER JOIN `tblstore` s ON(s.`TableID` = cc.`StoreID`)
-                             WHERE c.`Title` = '".$_REQUEST['url']."' ";// and cc.endDate >= CURDATE()";
+                             WHERE c.`Title` = '".secureTextForDb($requestUrl)."' ";// and cc.endDate >= CURDATE()";
                 $db->query($query);
                 while($db->next_record()){
                     ?>

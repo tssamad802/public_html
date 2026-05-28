@@ -1,5 +1,6 @@
 <?php
     $db= new DB_Sql();
+    $requestUrl = $_REQUEST['url'] ?? '';
 ?>
 
 <section class="results m-t-30">
@@ -26,7 +27,7 @@
 </section>
 <script>
     <?php
-        $data = ($_REQUEST['url'] == "") ? "" : $_REQUEST['url'];
+        $data = $requestUrl;
     ?>
     SimpleAjax('<?php echo RESOURCES_DOMAIN;?>/ajax/ajax_expireCoupon.php?actions=couponlisting&data=<?=$data?>&page=0','searchfrm','resultDiv');
     //SimpleAjax('<?php //echo RESOURCES_DOMAIN;?>///ajax/ajax_coupon.php?actions=relatedProduct&url=<?//=$data?>//&page=0','searchfrm','resultDiv1');

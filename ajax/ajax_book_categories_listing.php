@@ -3,8 +3,12 @@ include_once("../classes/commonfunctions.php");
 include_once("../classes/ajaxpagination.class.php");
 include_once("ajax.php");
 $whereCond = '';
-$q = $_REQUEST['q'];
-$Active = $_REQUEST['Active'];
+$q = $_REQUEST['q'] ?? '';
+$Active = $_REQUEST['Active'] ?? '';
+$actions = $_REQUEST['actions'] ?? '';
+$output = '';
+$finalstring = '';
+$class = '';
 
 
 if($q!='' && $q != 'Text')
@@ -16,7 +20,7 @@ if($Active != '')
 {
 	$whereCond .= ' and Active="'.$Active.'"';
 }
-if($_REQUEST['actions'] == "book_categories_listing")
+if($actions == "book_categories_listing")
 {
 	$perPage = new PerPage();
 	$page = 1;
@@ -77,7 +81,7 @@ if($_REQUEST['actions'] == "book_categories_listing")
 	echo $output;
 }
 
-if($_REQUEST['actions'] == "leftmenu")
+if($actions == "leftmenu")
 {
 	$sql="select * from tblnews where Active='".ACTIVE."'  order by NewsDate DESC, TableID DESC"; 
 	$db->query($sql);

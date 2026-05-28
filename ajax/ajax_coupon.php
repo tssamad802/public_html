@@ -5,7 +5,10 @@
     $whereCond = '';
     $q = isset($_REQUEST['q']) ? $_REQUEST['q'] : '';
     $Active = isset($_REQUEST['Active']) ? $_REQUEST['Active'] : '';
-    if($_REQUEST['actions'] == "couponlisting")
+    $actions = $_REQUEST['actions'] ?? '';
+    $data = $_REQUEST['data'] ?? '';
+    $url = $_REQUEST['url'] ?? '';
+    if($actions == "couponlisting")
     {
     $perPage = new PerPage();
     $pagelimit = $perPage->perpage;
@@ -15,8 +18,8 @@
     }
     echo '<div class="col-sm-9">';
     $whereCond = "";
-    if($_REQUEST['data'] != ""){
-        $whereCond .= " and ctype.URLKeyword = '".$_REQUEST['data']."'";
+    if($data != ""){
+        $whereCond .= " and ctype.URLKeyword = '".secureTextForDb($data)."'";
     }
     $start = ($page-1)*$perPage->perpage;
     if($start < 0) $start = 0;
@@ -143,9 +146,10 @@ else
     echo $output = "<h3>No coupon here</h3>";
 }
 
-if($_REQUEST['actions'] == 'relatedProduct')
-{   $type = $_REQUEST['url'];
-$query="SELECT * FROM `tblcoupontype` WHERE URLKeyword = '$type'";
+if($actions == 'relatedProduct')
+{   $type = $url;
+    $Title = '';
+$query="SELECT * FROM `tblcoupontype` WHERE URLKeyword = '".secureTextForDb($type)."'";
 $db->query($query);
 while($db->next_record()){
     $Title = $db->f('Title');
@@ -250,7 +254,7 @@ while($db->next_record()){
         </div>
     </div>
 <?php }
-if($_REQUEST['actions'] == "couponlistingType")
+if($actions == "couponlistingType")
 {
     $perPage = new PerPage();
     $pagelimit = $perPage->perpage;
@@ -263,7 +267,7 @@ if($_REQUEST['actions'] == "couponlistingType")
     $queryproduct="SELECT c.TableID as TableID, c.description description, s.logo logo ,c.discount discount ,s.trackingUrl as storeTracking , c.featured as featured , c.endDate as expire , ctype.Title as coponType , c.CouponName as name , c.`TableID` AS id , c.couponCode as code , c.trackingLink as trackURL , c.description as Description ,c.sitewide as sitewide FROM `tblcoupon` c
                                                 INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)
                                                 INNER JOIN  `tblcoupontype` ctype ON ( ctype.`TableID` = c.`CouponTypeID` )
-                                                 WHERE c.Active = 1 and ctype.URLKeyword = ".$_REQUEST['data']; //c.endDate >= CURDATE() INNER JOIN `tblcoupontag` ctag ON (ctag.`TableID` = c.`CouponTagID`)
+                                                 WHERE c.Active = 1 and ctype.URLKeyword = '".secureTextForDb($data)."'"; //c.endDate >= CURDATE() INNER JOIN `tblcoupontag` ctag ON (ctag.`TableID` = c.`CouponTagID`)
     $db->query($queryproduct);
     $rowcount = $db->num_rows();
     $queryproduct =  $queryproduct . " limit " . $start . "," . $perPage->perpage;

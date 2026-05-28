@@ -511,9 +511,9 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
                                     <div class="form-row">
                                         <div class="col-md-6 mb-10">
                                             <label >Start Date <span>*</span></label>
-                                            <input type="text" name="startDate" class="form-control singleDatePicker" value="<?=($FetchData['storeDate']=="0000-00-00")?'':$FetchData['startDate']?>" readonly="readonly"  required />
+                                            <input type="text" name="startDate" id="startDate" class="form-control singleDatePicker" value="<?=($FetchData['startDate']=="0000-00-00")?'':$FetchData['startDate']?>" readonly="readonly" required data-required-message="Start Date is required." />
                                             <div class="invalid-feedback">
-                                                <?=ERROR_ANNOUNCEMENT_DATE?>
+                                                Start Date is required.
                                             </div>
                                         </div>
                                     </div>
@@ -539,13 +539,9 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
                                     <div class="form-row">
                                         <div class="col-md-6 mb-10 formtitleAr">
                                             <label >Down Votes  <span>*</span></label>
-                                            <input type="text" name="downVotes" class="form-control" value="<?=$FetchData['downVotes']?>" dir="ltr"  required />
+                                            <input type="number" name="downVotes" id="downVotes" class="form-control" value="<?=$FetchData['downVotes']?>" dir="ltr" min="0" step="1" required data-required-message="Down Votes is required and must be 0 or greater." />
                                             <div class="invalid-feedback">
-                                                <?=ERROR_TITLE_ENGLISH?>
-                                            </div>
-
-                                            <div class="invalid-feedback">
-                                                <?=ERROR_TITLE_ENGLISH?>
+                                                Down Votes is required and must be 0 or greater.
                                             </div>
                                         </div>
                                     </div>
@@ -668,11 +664,11 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
     {
         if($('#couponClassification').val() == "offer") {
             $('#couponCode').css('display', 'none');
-            $('#couponCodeAttr').removeAttr("required");
+            $('#couponCodeAttr').prop("required", false);
         }
         else {
             $('#couponCode').css('display', 'block');
-            $('#couponCodeAttr').attr("required");
+            $('#couponCodeAttr').prop("required", true);
         }
     }
     $('#sitewide').val('<?= htmlspecialchars($FetchData['sitewide'], ENT_QUOTES, 'UTF-8') ?>');
@@ -698,9 +694,28 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
     <?php if (($FetchData['couponClassification'] ?? '') == "offer") { ?>
     $('#couponClassification').val('<?= htmlspecialchars($FetchData['couponClassification'], ENT_QUOTES, 'UTF-8') ?>');
     $('#couponCode').css('display', 'none');
-    $('#couponCode').val('');
-    $('#couponCodeAttr').removeAttr("required");
+    $('#couponCodeAttr').val('');
+    $('#couponCodeAttr').prop("required", false);
     <?php } ?>
+
+    const validateCouponRequiredFields = () => {
+        const startDate = document.getElementById('startDate');
+        const downVotes = document.getElementById('downVotes');
+
+        if (startDate) {
+            startDate.setCustomValidity(startDate.value.trim() === '' ? 'Start Date is required.' : '');
+        }
+
+        if (downVotes) {
+            const value = downVotes.value.trim();
+            const parsedValue = Number(value);
+            downVotes.setCustomValidity(value === '' || !Number.isInteger(parsedValue) || parsedValue < 0 ? 'Down Votes is required and must be 0 or greater.' : '');
+        }
+    };
+
+    $('.needs-validation').on('submit', validateCouponRequiredFields);
+    $('#startDate, #downVotes').on('input change blur', validateCouponRequiredFields);
+    validateCouponRequiredFields();
     </script>
 
 

@@ -6,9 +6,10 @@ if(!isset($RUNFILE_FROM_INDEX_PAGE))
 $obj = new DB_Sql();
 $db = new DB_Sql();
 
-$url = explode('__' , $_REQUEST['url']);
+$requestUrl = $_REQUEST['url'] ?? '';
+$url = explode('__' , $requestUrl);
 
-$string = "select s.* , c.CountryTag tag , c.`CountryKeyword` keyword  from tblstore s inner join tblcountry c on (s.CountryID = c.TableID) where URLKeyword = '".$url[0] ."' and s.ACTIVE = 1";
+$string = "select s.* , c.CountryTag tag , c.`CountryKeyword` keyword  from tblstore s inner join tblcountry c on (s.CountryID = c.TableID) where URLKeyword = '".secureTextForDb($url[0] ?? '') ."' and s.ACTIVE = 1";
 $obj->query($string);
 while($obj->next_record()){
     $StoreID = $obj->f('TableID');

@@ -9,9 +9,10 @@ include_once("../classes/ajaxpagination.class.php");
 $whereCond = '';
 $q = $_REQUEST['q'] ?? '';
 $Active = $_REQUEST['Active'] ?? '';
+$actions = $_REQUEST['actions'] ?? '';
 
 
-if($_REQUEST['actions'] == "couponHomelisting")
+if($actions == "couponHomelisting")
 {
     $perPage = new PerPage();
     $pagelimit = $perPage->perpage;
@@ -113,7 +114,7 @@ if($_REQUEST['actions'] == "couponHomelisting")
 }
 }
 
-if( $_REQUEST['actions']=="storeHomelisting")
+if($actions=="storeHomelisting")
 {
     $perPage = new PerPage();
     $pagelimit = $perPage->perpage;
@@ -158,7 +159,7 @@ INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where  $whereCond order
 }
 
 
-if( $_REQUEST['actions']=="productHomelisting")
+if($actions=="productHomelisting")
 {
     $perPage = new PerPage();
     $pagelimit = $perPage->perpage;
@@ -185,9 +186,12 @@ if( $_REQUEST['actions']=="productHomelisting")
     if($db->num_rows() > 0)
     {
         while($db->next_record()){
-            $per = $db->f('NewPrice') / $db->f('OldPrice') * 100-100;
-            $per = intval($per);
-            $per = abs($per);
+            $per = 0;
+            if ($db->f('NewPrice') > 0 && $db->f('OldPrice') > 0) {
+                $per = $db->f('NewPrice') / $db->f('OldPrice') * 100-100;
+                $per = intval($per);
+                $per = abs($per);
+            }
             ?>
             <div class="col-md-3 col-lg-3" style="padding-left: 0px !important;">
                 <div class="coupon-wrapper row" style="background-color: white; margin:0px;">

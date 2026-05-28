@@ -38,6 +38,9 @@ include_once("../classes/ajaxpagination.class.php");
 $whereCond = '';
 $q = $_REQUEST['q'] ?? '';
 $Active = $_REQUEST['Active'] ?? '';
+$_REQUEST['actions'] = $_REQUEST['actions'] ?? '';
+$_REQUEST['data'] = $_REQUEST['data'] ?? '';
+$pagelimit = 0;
 
 if($_REQUEST['actions'] == "couponlisting")
 {

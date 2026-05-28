@@ -2,18 +2,20 @@
 include_once("ajax.php");
 include_once("../classes/ajaxpagination.class.php");
 $whereCond = '';
-$q = $_REQUEST['q'];
-$Active = $_REQUEST['Active'];
+$q = $_REQUEST['q'] ?? '';
+$Active = $_REQUEST['Active'] ?? '';
+$term = $_REQUEST['term'] ?? '';
 
 
-if($_REQUEST['term'] != "")
+if($term != "")
 {
     $perPage = new PerPage();
+    $pagelimit = $perPage->perpage;
     $page = 1;
     if(!empty($_REQUEST["page"])) {
         $page = $_REQUEST["page"];
     }
-    $whereCond = "and name LIKE '%".$_REQUEST['term']."%' ORDER BY name ASC";
+    $whereCond = "and name LIKE '%".secureTextForDb($term)."%' ORDER BY name ASC";
     $start = ($page-1)*$perPage->perpage;
     if($start < 0) $start = 0;
     $queryproduct = "select * from tblstore where Active = 1 ".$whereCond." ";

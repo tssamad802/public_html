@@ -18,18 +18,21 @@
 include_once("ajax.php");
 include_once("../classes/ajaxpagination.class.php");
 $whereCond = '';
-$q = $_REQUEST['q'];
-$Active = $_REQUEST['Active'];
-$query = "select * from `tblcategory` where `URLKeyword` = '".$_REQUEST['data']."';";
+$q = $_REQUEST['q'] ?? '';
+$Active = $_REQUEST['Active'] ?? '';
+$actions = $_REQUEST['actions'] ?? '';
+$data = $_REQUEST['data'] ?? '';
+$query = "select * from `tblcategory` where `URLKeyword` = '".secureTextForDb($data)."';";
                 $db->query($query);
                 $TableID = 0;
                 while ($db->next_record()) {
                     if(!$db->f('ParentID') > 0)
                         $TableID = $db->f('TableID');
                 }
-if($_REQUEST['actions'] == "couponlisting")
+if($actions == "couponlisting")
 {
 $perPage = new PerPage();
+$pagelimit = $perPage->perpage;
 $page = 1;
 if(!empty($_REQUEST["page"])) {
     $page = $_REQUEST["page"];
@@ -38,7 +41,7 @@ $start = ($page-1)*$perPage->perpage;
   
 
                 if(!$TableID > 0)
-                    $where = " category.`URLKeyword` = '".$_REQUEST['data']."'";
+                    $where = " category.`URLKeyword` = '".secureTextForDb($data)."'";
                 else
                     $where = "category.`TableID` = '".$TableID."' OR category.`ParentID` = '".$TableID."'";
 
@@ -54,7 +57,7 @@ $start = ($page-1)*$perPage->perpage;
                 $db->query($query);
                 $RecordCount=$pagelimit * ($start - 1);
 
-                $perpageresult = $perPage->getAllPageLinks($rowcount,'/ajax/ajax_coupon_category.php?actions=couponlisting&data='.$_REQUEST["data"].'&page=','searchfrm','resultDiv');
+                $perpageresult = $perPage->getAllPageLinks($rowcount,'/ajax/ajax_coupon_category.php?actions=couponlisting&data='.urlencode($data).'&page=','searchfrm','resultDiv');
                 if($db->num_rows() > 0){
                 while($db->next_record()){
                     ?>
@@ -140,11 +143,11 @@ $start = ($page-1)*$perPage->perpage;
 
 
 
-if($_REQUEST['actions'] == "relatedProduct")
+if($actions == "relatedProduct")
 {
 
                 if(!$TableID > 0)
-                    $where = " c.`URLKeyword` = '".$_REQUEST['data']."' GROUP BY p.TableID";
+                    $where = " c.`URLKeyword` = '".secureTextForDb($data)."' GROUP BY p.TableID";
                 else
                     $where = "c.`ParentID` = '".$TableID."' GROUP BY p.TableID";
     ?>
@@ -166,6 +169,7 @@ INNER JOIN `tblstore` s ON (s.`TableID` = p.`StoreID`)
                         <?php
                     while($db->next_record())
                     {   
+                        $per = 0;
                         if($db->f('NewPrice') > 0 && $db->f('OldPrice') > 0) {
                            $per = $db->f('NewPrice') / $db->f('OldPrice') * 100-100;
                             $per = intval($per);

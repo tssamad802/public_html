@@ -380,13 +380,19 @@ if($_REQUEST['Action']=="TestDetails")
     {
     $RecordID = $_REQUEST['RecordID'];
     $FetchData = FetchRecordByID($RecordID,"TableID","tblcoupon");
-    $NetworkData = FetchRecordByID($FetchData['NetworkID'],"TableID","tblnetwork");
-    $StoreData = FetchRecordByID($FetchData['StoreID'],"TableID","tblstore");
+    $NetworkID = $FetchData['NetworkID'] ?? 0;
+    $StoreID = $FetchData['StoreID'] ?? 0;
+    $CreatedBy = $FetchData['CreatedBy'] ?? 0;
+    $CouponTypeID = $FetchData['CouponTypeID'] ?? 0;
+    $CouponTagID = $FetchData['CouponTagID'] ?? 0;
+    $CountryID = $FetchData['CountryID'] ?? 0;
+    $NetworkData = $NetworkID ? FetchRecordByID($NetworkID,"TableID","tblnetwork") : [];
+    $StoreData = $StoreID ? FetchRecordByID($StoreID,"TableID","tblstore") : [];
 //    $CountryData = FetchRecordByID($FetchData['CountryID'],"TableID","tblcountry");
-    $LoginData = FetchRecordByID($FetchData['CreatedBy'],"TableID","tbluserregistration_log");
-    $CouponTypeData = FetchRecordByID($FetchData['CouponTypeID'],"TableID","tblcoupontype");
-    $CouponTagData = FetchRecordByID($FetchData['CouponTagID'],"TableID","tblcoupontag");
-    $CountryData = FetchRecordByID($FetchData['CountryID'],"TableID","tblcountry");
+    $LoginData = $CreatedBy ? FetchRecordByID($CreatedBy,"TableID","tbluserregistration_log") : [];
+    $CouponTypeData = $CouponTypeID ? FetchRecordByID($CouponTypeID,"TableID","tblcoupontype") : [];
+    $CouponTagData = $CouponTagID ? FetchRecordByID($CouponTagID,"TableID","tblcoupontag") : [];
+    $CountryData = $CountryID ? FetchRecordByID($CountryID,"TableID","tblcountry") : [];
 //    $CategoryData = array();
 //    $CategoryID = explode(',' , $FetchData['CategoryID']);
 //    foreach ($CategoryID as $data)
@@ -414,7 +420,7 @@ if($_REQUEST['Action']=="TestDetails")
                         </tr>
                         <tr>
                             <th>Store Name</th>
-                            <td scope="row"><?=$StoreData['name']?></td>
+                            <td scope="row"><?=$StoreData['name'] ?? ''?></td>
                         </tr>
 
                         <tr>
@@ -463,23 +469,23 @@ if($_REQUEST['Action']=="TestDetails")
                         </tr>
                         <tr>
                             <th>Coupon Type</th>
-                            <td scope="row"><?=$CouponTypeData['Title']?></td>
+                            <td scope="row"><?=$CouponTypeData['Title'] ?? ''?></td>
                         </tr>
                         <tr>
                             <th>Coupon Tag</th>
-                            <td scope="row"><?=$CouponTagData['Title']?></td>
+                            <td scope="row"><?=$CouponTagData['Title'] ?? ''?></td>
                         </tr>
                         <tr>
                             <th>Network ID</th>
-                            <td scope="row"><?=$NetworkData['NetID']?></td>
+                            <td scope="row"><?=$NetworkData['NetID'] ?? ''?></td>
                         </tr>
                         <tr>
                             <th>Network Name</th>
-                            <td scope="row"><?=$NetworkData['Title']?></td>
+                            <td scope="row"><?=$NetworkData['Title'] ?? ''?></td>
                         </tr>
                         <tr>
                             <th>CreatedBy</th>
-                            <td scope="row"><?=$LoginData['FullName']?></td>
+                            <td scope="row"><?=$LoginData['FullName'] ?? ''?></td>
                         </tr>
                         <tr>
                             <th>DateTime</th>
@@ -522,7 +528,7 @@ if($_REQUEST['Action']=="TestDetails")
 
 
     <div class="card">
-        <div class="card-header card-header-action tabdesignbox"><?=TXT_REGISTER_NO.' ('.$LoginData['RegID'].')'?></div>
+        <div class="card-header card-header-action tabdesignbox"><?=TXT_REGISTER_NO.' ('.($LoginData['RegID'] ?? '').')'?></div>
         <div class="card-body">
             <div class="form-row">
                 <div class="table-responsive">
@@ -530,29 +536,29 @@ if($_REQUEST['Action']=="TestDetails")
                         <thead class="thead-info">
                         <tr>
                             <th width="200"><?=TXT_NAME?></th>
-                            <td scope="row"><?=$LoginData['FullName']?></td>
+                            <td scope="row"><?=$LoginData['FullName'] ?? ''?></td>
                         </tr>
                         <tr>
                             <th><?=TXT_GENDER?></th>
-                            <td scope="row"><?=($LoginData['Gender']==1)?TXT_MALE:TXT_FEMALE?></td>
+                            <td scope="row"><?= (($LoginData['Gender'] ?? '') == 1) ? TXT_MALE : TXT_FEMALE ?></td>
                         </tr>
                         <tr>
                             <th><?=TXT_DOB?></th>
-                            <td scope="row"><?=onlydateshortformat($LoginData['DOB'])?></td>
+                            <td scope="row"><?=onlydateshortformat($LoginData['DOB'] ?? '')?></td>
                         </tr>
 
                         <tr>
                             <th><?=TXT_EMAIL?></th>
-                            <td scope="row"><?=$LoginData['Email']?></td>
+                            <td scope="row"><?=$LoginData['Email'] ?? ''?></td>
                         </tr>
                         <tr>
                             <th><?=TXT_MOBILE?></th>
-                            <td scope="row"><?=$LoginData['Mobile']?></td>
+                            <td scope="row"><?=$LoginData['Mobile'] ?? ''?></td>
                         </tr>
 
                         <tr>
                             <th><?=TXT_NATIONALITY?></th>
-                            <td scope="row"><?=getFieldDataByID("Nationality".LANG_SEP_DB,"TableID",$LoginData['NationalityID'],"tblcountries")?></td>
+                            <td scope="row"><?=($LoginData['NationalityID'] ?? '') !== '' ? getFieldDataByID("Nationality".LANG_SEP_DB,"TableID",$LoginData['NationalityID'],"tblcountries") : ''?></td>
                         </tr>
                         </thead>
                     </table>

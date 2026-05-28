@@ -211,13 +211,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -233,13 +233,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -259,13 +259,13 @@ class Rountinefunctions extends Databaseconnection
 						$Text="";
 							while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 							{
-								if($SelectedIndex==$row{0})
+								if($SelectedIndex==$row[0])
 								{
-								$Text.="<option selected value='".$row{0}."'>".$row{1}."</option>";
+								$Text.="<option selected value='".$row[0]."'>".$row[1]."</option>";
 								}
 								else
 								{
-								$Text.="<option value='".$row{0}."'>".$row{1}."</option>";
+								$Text.="<option value='".$row[0]."'>".$row[1]."</option>";
 								}
 							}
 				}else
@@ -283,25 +283,25 @@ class Rountinefunctions extends Databaseconnection
 						$Text="";
 							while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 							{
-								$Flag=$this->checkIfParent($row{0});
+								$Flag=$this->checkIfParent($row[0]);
 								$Flag=0;
 								if($Flag==0)
 								{
-											if($row{2}==0)
+											if($row[2]==0)
 											{
-												$Label=$row{1};
+												$Label=$row[1];
 											}else
 											{
-												$Parent=$this->GetFieldDataByID('EnglishService','TableID',$row{2},'tblservices');
-												$Label=$row{1}.' ('.$Parent.')';
+												$Parent=$this->GetFieldDataByID('EnglishService','TableID',$row[2],'tblservices');
+												$Label=$row[1].' ('.$Parent.')';
 											}
-											if($SelectedIndex==$row{0})
+											if($SelectedIndex==$row[0])
 											{
-											$Text.="<option selected value='".$row{0}."'>".$Label."</option>";
+											$Text.="<option selected value='".$row[0]."'>".$Label."</option>";
 											}
 											else
 											{
-											$Text.="<option value='".$row{0}."'>".$Label."</option>";
+											$Text.="<option value='".$row[0]."'>".$Label."</option>";
 											}
 								}
 							}
@@ -335,13 +335,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{2}." - ".$row{3}." - ".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[2]." - ".$row[3]." - ".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{2}." - ".$row{3}." - ".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[2]." - ".$row[3]." - ".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -359,13 +359,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{2}." ".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[2]." ".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{2}." ".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[2]." ".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -383,13 +383,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -406,13 +406,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -429,13 +429,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -452,13 +452,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".date($row{1})."</option>";
+						$Text.="<option selected value='".$row[0]."'>".date($row[1])."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".date($row{1})."</option>";
+						$Text.="<option value='".$row[0]."'>".date($row[1])."</option>";
 						}
 					}
 						mysqli_close();
@@ -474,20 +474,20 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($row{2}==1)
+						if($row[2]==1)
 						{
 							$Phase="Phase 1";
 						}else
 						{
 							$Phase="Phase 2";
 						}
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>(".$Phase.") - ".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>(".$Phase.") - ".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>(".$Phase.") - ".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>(".$Phase.") - ".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -505,13 +505,13 @@ class Rountinefunctions extends Databaseconnection
 				$Text="";
 					while($row=mysqli_fetch_array($result,MYSQLI_NUM))
 					{
-						if($SelectedIndex==$row{0})
+						if($SelectedIndex==$row[0])
 						{
-						$Text.="<option selected value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option selected value='".$row[0]."'>".$row[1]."</option>";
 						}
 						else
 						{
-						$Text.="<option value='".$row{0}."'>".$row{1}."</option>";
+						$Text.="<option value='".$row[0]."'>".$row[1]."</option>";
 						}
 					}
 						mysqli_close();
@@ -1921,10 +1921,10 @@ function buildservicearray()
 		$result=mysqli_query($db_conn,$sqlQuery);
 		while($row=mysqli_fetch_array($result,MYSQLI_BOTH))
 		{
-			$ServicesArray[$row{'TableID'}]['TableID']=$row{'TableID'};
-			$ServicesArray[$row{'TableID'}]['EnglishService']=$row{'EnglishService'};
-			$ServicesArray[$row{'TableID'}]['Prefix']=$row{'Prefix'};
-			$ServicesArray[$row{'TableID'}]['ParentID']=$row{'ParentID'};
+			$ServicesArray[$row['TableID']]['TableID']=$row['TableID'];
+			$ServicesArray[$row['TableID']]['EnglishService']=$row['EnglishService'];
+			$ServicesArray[$row['TableID']]['Prefix']=$row['Prefix'];
+			$ServicesArray[$row['TableID']]['ParentID']=$row['ParentID'];
 		}
 	return $ServicesArray;
 }
