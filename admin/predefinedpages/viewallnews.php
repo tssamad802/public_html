@@ -539,7 +539,7 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
                                     <div class="form-row">
                                         <div class="col-md-6 mb-10 formtitleAr">
                                             <label >Down Votes  <span>*</span></label>
-                                            <input type="text" name="downVotes" class="form-control" value="<?=$FetchData['downVotes']?>" dir="ltr"   />
+                                            <input type="text" name="downVotes" class="form-control" value="<?=$FetchData['downVotes']?>" dir="ltr"  required />
                                             <div class="invalid-feedback">
                                                 <?=ERROR_TITLE_ENGLISH?>
                                             </div>

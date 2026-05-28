@@ -91,7 +91,7 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
                                                         <th align="left">Name</th>
                                                         <th align="right" style="text-align:right;">Code</th>
                                                      <!--   <th align="center" style="text-align:center;">Tracking</th>-->
-                                                        <!--<th align="center">Logo</th>-->
+                                                            <!--<th align="center">Logo</th>-->
                                                         <th align="center">Init</th>
                                                         <th align="center">Expire</th>
                                         <!--                  <th width="8%" align="center">Date</th>-->
