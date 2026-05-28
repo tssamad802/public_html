@@ -12,7 +12,7 @@ include_once(__DIR__ . "/../classes/commonfunctions.php");
 DecodeUrl();
 
 //  echo '<pre>';
-//  print_r( $_SESSION );
+//  print_r( $_SESSION[WEB_SESSION.'_userid'] );
 //  echo '</pre>';
 //  exit;
 

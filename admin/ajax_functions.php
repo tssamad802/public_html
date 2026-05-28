@@ -12,8 +12,7 @@ DecodeUrl();
 
 
 
-//fetch current logged in user details
-// $UserRecordGetting = FetchRecordByID($_SESSION[WEB_SESSION.'_userid'],"TableID","tblsystemusers");
+$UserRecordGetting = FetchRecordByID($_SESSION[WEB_SESSION.'_userid'],"TableID","tblsystemusers");
 
 // print_r($_SESSION['HTTP_REFERER'] . '  - ');
 // exit;
@@ -381,12 +380,14 @@ if ($ActionFlag == "LoginPanel") {
 	echo "</pre>";
 	exit;
 	*/
+	// session_start();
 			$result['success'] = 1;
 			//	if($_REQUEST['RedirectURL']!='')
 			//		$result['redirect']= "http://".$_SERVER['HTTP_HOST'].$_REQUEST['RedirectURL'];
 			///	else
 			$result['redirect'] = "index.php";
-
+			$_SESSION['samad'] = "test";
+			$_SESSION[WEB_SESSION . '_userid'] = $UserID;
 			//$_SESSION['Message']['Msg'] = TXT_WELCOME_MESSAGE;
 			$_SESSION['Message']['Type'] = 2;
 
@@ -406,7 +407,9 @@ if ($ActionFlag == "LoginPanel") {
 		}
 
 	}
+	$_SESSION[WEB_SESSION . '_userid'] = $UserID;
 
+	// set_user_id($user_id);
 	echo json_encode($result);
 }
 

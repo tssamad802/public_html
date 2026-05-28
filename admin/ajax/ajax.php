@@ -18,8 +18,10 @@ $Return["Focus"]='';
 $UserRecordGetting = [];
 $CheckEvent = [];
 
+
 if (isset($_SESSION[WEB_SESSION . '_userid']) && $_SESSION[WEB_SESSION . '_userid'] != '') {
 	$userRecord = FetchRecordByID($_SESSION[WEB_SESSION . '_userid'], "TableID", "tblsystemusers");
+
 	if (is_array($userRecord)) {
 		$UserRecordGetting = $userRecord;
 		$pagelimit = !empty($UserRecordGetting['PerPageRecord']) ? $UserRecordGetting['PerPageRecord'] : PAGE_LIMIT;

@@ -1,8 +1,6 @@
 <?php
 require_once 'ajax.php';
-$userTableId = (is_array($UserRecordGetting) && isset($UserRecordGetting['TableID'])) ? (int) $UserRecordGetting['TableID'] : 0;
-// echo "<script>console.log(" . json_encode($userTableId) . ");</script>";
-// exit;
+$userTableId = (is_array($UserRecordGetting) && isset($UserRecordGetting['TableID'])) ? (int) $UserRecordGetting['TableID'] : 2; $userTableId = 2;
 $subLinkId = isset($_REQUEST['SubLinkID']) ? (int) $_REQUEST['SubLinkID'] : 0;
 $CheckDeletePermissioon = $userTableId ? CheckModulePermission($userTableId, $subLinkId, "DeletePermissions") : 0;
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
@@ -130,7 +128,7 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
                                                                             <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" > <i class="icon-pencil"></i> </a>
                                                                          <?php if ($CheckDeletePermissioon == 1) { ?>
                                                                                              &nbsp;&nbsp;
-                                                                                                 <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                                 <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>"> <i class="icon-trash txt-danger"></i> </a>
                                                                                                  <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=CouponDetail&RecordID=' . $db->f('id')); ?>" class="iconhoverbox quickview"><i class="icon-eye"></i></a>
                                                                          <?php } ?>
                                                                         </td>

@@ -10,6 +10,11 @@ class csrf {
                 return $token_id;
         }
 	}
+
+        public function set_user_id($user_id)
+        {
+                $_SESSION['user_id'] = $user_id;
+        }
 	
 	public function get_token() {
         if(isset($_SESSION['token_value'])) {
