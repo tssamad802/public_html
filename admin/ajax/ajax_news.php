@@ -534,6 +534,7 @@ ORDER BY s.name ASC;";
                                             $records = [];
                                             while ($db->next_Record()) {
                                                 $records[] = $db->Record; // store each row (assuming $db->Record is the associative array)
+                                                //echo "<script>console.log(" . json_encode($records) . ");</script>";
                                             }
 
                                             // Step 2: Loop using a for loop
@@ -571,7 +572,7 @@ ORDER BY s.name ASC;";
                                                                         </a>
                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
                                                                                                 &nbsp;&nbsp;
-                                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($row['id']) ?>" title="<?= TXT_DELETE_RECORD ?>">
+                                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($row['id']) ?>">
                                                                                                     <i class="icon-trash txt-danger"></i>
                                                                                                 </a>
                                                                                                 <a href="javascript:;" data-href="AllQuickViewDetails.php?<?= EncodeUrl('Action=StoreDetail&RecordID=' . $row['id']) ?>" class="iconhoverbox quickview">
