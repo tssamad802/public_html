@@ -37,7 +37,7 @@ if(!isset($_REQUEST['PageType']))
                         <div class="form-row">
                             <div class="col-md-6 mb-10">
                                 <label > Coupon Name  <span>*</span></label>
-                                <input type="text" name="CouponName" class="form-control" value=""  />
+                                <input type="text" name="CouponName" class="form-control" value=""  required/>
                             </div>
 
                             <div class="col-md-6 mb-10">
@@ -68,12 +68,12 @@ if(!isset($_REQUEST['PageType']))
                             <div class="form-row">
                                 <div class="col-md-6 mb-10">
                                     <label > Inital Date  <span>*</span></label>
-                                    <input type="text" name="startDate" class="form-control" value=""  />
+                                    <input type="text" name="startDate" class="form-control" value=""  required/>
                                 </div>
 
                                 <div class="col-md-6 mb-10">
                                     <label >Expire Date<span>*</span></label>
-                                    <input type="text" name="endDate" class="form-control" value=""  />
+                                    <input type="text" name="endDate" class="form-control" value=""  required/>
                                 </div>
 
                             </div>

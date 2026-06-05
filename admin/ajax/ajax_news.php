@@ -358,7 +358,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'sortstore') {
                     $whereCond = "s.`TableID` = " . $_REQUEST['RecordID'] . "  and c.endDate >= CURDATE()";//
 //$sql="select * from  $TableName order by storeDate DESC";
                     $sql = "SELECT c.* ,s.name as name ,s.Active active , s.`TableID` AS id ,c.TableID as TableID , c.couponName CouponName , c.endDate date FROM tblcoupon c 
-INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)  where $whereCond order by c.SEQUENCE ASC";
+INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)  where $whereCond order by c.SEQUENCE ASC";          
 
                     // echo $sql;
                 
@@ -366,11 +366,11 @@ INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)  where $whereCond order b
                  
                     $db->query($sql);
                     $RecordCount = 0;
-                    if ($db->num_rows() > 0) {
+                    if ($db->num_rows() > 0) {                                   
                         ?>
                                                 <table id="couponSorting" class="table table-hover w-100 display pb-30 sort-table"> <!-- removed id datatable_1 -->
                                                     <thead>
-                                                    <tr>
+                                                    <tr>                                                                                                                              
                                         <!--                <th width="4%" align="center" >--><?//=SNO ?><!--</th>-->
                                                         <th align="left">Coupon Name</th>
                                                         <th align="left">Coupon Class</th>

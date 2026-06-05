@@ -12,7 +12,7 @@ DecodeUrl();
 
 
 
-$UserRecordGetting = FetchRecordByID($_SESSION[WEB_SESSION.'_userid'],"TableID","tblsystemusers");
+$UserRecordGetting = FetchRecordByID($_SESSION[WEB_SESSION . '_userid'], "TableID", "tblsystemusers");
 
 // print_r($_SESSION['HTTP_REFERER'] . '  - ');
 // exit;
@@ -380,7 +380,7 @@ if ($ActionFlag == "LoginPanel") {
 	echo "</pre>";
 	exit;
 	*/
-	// session_start();
+			// session_start();
 			$result['success'] = 1;
 			//	if($_REQUEST['RedirectURL']!='')
 			//		$result['redirect']= "http://".$_SERVER['HTTP_HOST'].$_REQUEST['RedirectURL'];
@@ -1987,6 +1987,8 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 					MetaDescription='" . secureTextForDb($_POST['MetaDescription'] ?? '') . "' ,
 					description='" . secureTextForDb($_POST['description'] ?? '') . "'    
 				   ";
+		// echo "<script>alert(" . $Query . ");</script>";
+		// exit; alert is not working here because of json encode in the end of this file
 
 		if (($_POST['URLKeyword'] ?? '') == '') {
 			$URLKeyword = $_POST['URLKeyword'] ?? '';
@@ -2027,6 +2029,8 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 						CreatedDateTime=NOW()
 					  ";
 		$db->query($Query);
+		//  echo "<script>alert(" . $Query . ");</script>";
+		// exit();
 		$InsertRecordID = $Trigger != 'edit' ? $db->MysqlInsertID() : $RecordID;
 		if ($Trigger == 'edit') {
 			$sql = "delete from tblcouponcategory  Where CouponID='" . $RecordID . "';";
@@ -2067,7 +2071,11 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 		$_SESSION['Message']['Type'] = 2;
 	}
 
+	//  echo "<scrip></script>alert(" . json_encode($Query) . ");</script>";
+    // die();
+	//echo json_encode($query);
 	echo json_encode($result);
+	//echo "<script>alert(". json_encode($Query) . ");</script>";
 } else if ($ActionFlag == 'AddEditSlider') {
 	$TableName = "tblslider";
 
@@ -2139,6 +2147,7 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 	}
 
 	echo json_encode($result);
+	//echo "<script>alert(". json_encode($result) . ");</script>";
 } else if ($ActionFlag == 'AddEditPublicationForm') {
 	$TableName = "tblpolicy";
 
