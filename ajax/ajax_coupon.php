@@ -23,12 +23,44 @@
     }
     $start = ($page-1)*$perPage->perpage;
     if($start < 0) $start = 0;
-    $queryproduct="SELECT c.TableID as TableID, c.description description, c.landingLink landingLink,s.logo logo, s.webUrl as StoreWeb ,c.discount discount ,s.trackingUrl as storeTracking , c.featured as featured , c.endDate as endDate , ctype.Title as coponType , c.CouponName as name , c.`TableID` AS id , c.couponCode as code , c.trackingLink as trackURL , c.description as Description ,c.sitewide as sitewide, s.url as url ,
-            s.Active storeStatus, s.disableUrl FROM `tblcoupon` c
-                                                INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)
-                                                INNER JOIN  `tblcoupontype` ctype ON ( ctype.`TableID` = c.`CouponTypeID` )
-                                                 ".$whereCond." "; //c.endDate >= CURDATE() INNER JOIN `tblcoupontag` ctag ON (ctag.`TableID` = c.`CouponTagID`)
+    // $queryproduct="SELECT c.TableID as TableID, c.description description, c.landingLink landingLink,s.logo logo, s.webUrl as StoreWeb ,c.discount discount ,s.trackingUrl as storeTracking , c.featured as featured , c.endDate as endDate , ctype.Title as coponType , c.CouponName as name , c.`TableID` AS id , c.couponCode as code , c.trackingLink as trackURL , c.description as Description ,c.sitewide as sitewide, s.url as url ,
+    //         s.Active storeStatus, s.disableUrl FROM `tblcoupon` c
+    //                                             INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)
+    //                                             INNER JOIN  `tblcoupontype` ctype ON ( ctype.`TableID` = c.`CouponTypeID` )
+    //                                              ".$whereCond." "; //c.endDate >= CURDATE() INNER JOIN `tblcoupontag` ctag ON (ctag.`TableID` = c.`CouponTagID`)
                                                 //  exit($queryproduct);
+$queryproduct = "SELECT 
+    c.TableID as TableID, 
+    c.description description, 
+    c.landingLink landingLink,
+    s.logo logo, 
+    s.webUrl as StoreWeb,
+    c.discount discount,
+    s.trackingUrl as storeTracking,
+    c.featured as featured,
+    c.endDate as endDate,
+    ctype.Title as coponType,
+    c.CouponName as name,
+    c.TableID AS id,
+    c.couponCode as code,
+    c.trackingLink as trackURL,
+    c.description as Description,
+    c.sitewide as sitewide,
+    s.url as url,
+    s.Active storeStatus,
+    s.disableUrl,
+    c.Active as couponStatus,
+    c.CreatedDateTime as createdDate
+FROM `tblcoupon` c
+INNER JOIN `tblstore` s ON (c.StoreID = s.TableID)
+INNER JOIN `tblcoupontype` ctype ON (ctype.TableID = c.CouponTypeID)
+WHERE 1=1
+AND c.Active = 1
+AND (c.endDate >= CURDATE() OR c.endDate = '0000-00-00')
+" . $whereCond . "
+ORDER BY c.TableID DESC";
+                                                // echo "<script>alert(" . json_encode($queryproduct) . ");</script>";
+                                                //echo "<script>console.log(" . json_encode($queryproduct) . ");</script>";
     $db->query($queryproduct);
     $rowcount = $db->num_rows();
     $queryproduct =  $queryproduct . " limit " . $start . "," . $perPage->perpage;

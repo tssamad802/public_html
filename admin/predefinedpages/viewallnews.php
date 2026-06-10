@@ -511,7 +511,7 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
                                     <div class="form-row">
                                         <div class="col-md-6 mb-10">
                                             <label >Start Date <span>*</span></label>
-                                            <input type="text" name="startDate" id="startDate" class="form-control singleDatePicker" value="<?=($FetchData['startDate']=="0000-00-00")?'':$FetchData['startDate']?>" readonly="readonly" required data-required-message="Start Date is required." />
+                                            <input type="text" name="startDate" id="startDate" class="form-control singleDatePicker" value="<?=($FetchData['startDate']=="0000-00-00")?'':$FetchData['startDate']?>" readonly="readonly" data-required-message="Start Date is required." />
                                             <div class="invalid-feedback">
                                                 Start Date is required.
                                             </div>
@@ -539,7 +539,7 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
                                     <div class="form-row">
                                         <div class="col-md-6 mb-10 formtitleAr">
                                             <label >Down Votes  <span>*</span></label>
-                                            <input type="number" name="downVotes" id="downVotes" class="form-control" value="<?=$FetchData['downVotes']?>" dir="ltr" min="0" step="1" required data-required-message="Down Votes is required and must be 0 or greater." />
+                                            <input type="number" name="downVotes" id="downVotes" class="form-control" value="<?=$FetchData['downVotes']?>" dir="ltr" min="0" step="1" data-required-message="Down Votes is required and must be 0 or greater." />
                                             <div class="invalid-feedback">
                                                 Down Votes is required and must be 0 or greater.
                                             </div>

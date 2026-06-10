@@ -32,6 +32,7 @@ function SimpleAjax(pageUrl, FormId, divId) {
     //async: false,
     data: dataVar,
     success: function (msg) {
+      // alert(msg);
       jQuery("#" + divId).empty();
       jQuery("#" + divId).html(msg);
 
@@ -265,6 +266,7 @@ function formvalidation() {
         data: formData,
         dataType: "json",
         success: function (msg) {
+          // console.log(msg.sql);
           if (msg.error != "") {
             HideScreen();
             showweballmessages(msg.error, 1);
@@ -394,7 +396,7 @@ function formvalidation() {
             if (msg.OpenInNewWindow != "") {
               window.open(msg.OpenInNewWindow);
             }
-            if (msg.redirect != "") {
+            if (msg.redirect != "") {  
               window.location.href = msg.redirect;
             } else if (msg.selfredirect == 1) {
               location.reload();

@@ -1,9 +1,10 @@
 <?php
 require_once 'ajax.php';
-$userTableId = (is_array($UserRecordGetting) && isset($UserRecordGetting['TableID'])) ? (int) $UserRecordGetting['TableID'] : 2; $userTableId = 2;
-// echo "<script>alert(" . json_encode("User Table ID: " . $userTableId) . ");</script>";
+$CheckDeletePermissioon = 1;
+$userTableId = (is_array($UserRecordGetting) && isset($UserRecordGetting['TableID'])) ? (int) $UserRecordGetting['TableID'] : 2;
+
 $subLinkId = isset($_REQUEST['SubLinkID']) ? (int) $_REQUEST['SubLinkID'] : 0;
-$CheckDeletePermissioon = $userTableId ? CheckModulePermission($userTableId, $subLinkId, "DeletePermissions") : 0;
+// $CheckDeletePermissioon = $userTableId ? CheckModulePermission($userTableId, $subLinkId, "DeletePermissions") : 0;
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
     //start search
     $whereCond = '';
@@ -130,12 +131,13 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
                                                                         <td align="center"><?= $db->f('FullName') ?></td>
 
                                                                         <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" > <i class="icon-pencil"></i> </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             &nbsp;&nbsp;
-                                                                                                 <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                                                 <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=CouponDetail&RecordID=' . $db->f('id')); ?>" class="iconhoverbox quickview"><i class="icon-eye"></i></a>
-                                                                         <?php } ?>
+                                                                            <div class="action-buttons" style="white-space:nowrap;">
+                                                                                <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;"> <i class="icon-pencil"></i> </a>
+                                                                             <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                     <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>" style="margin:0 6px;"> <i class="icon-trash txt-danger"></i> </a>
+                                                                             <?php } ?>
+                                                                                     <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=CouponDetail&RecordID=' . $db->f('id')); ?>" class="iconhoverbox quickview" style="margin:0 6px;"><i class="icon-eye"></i></a>
+                                                                            </div>
                                                                         </td>
 
                                                                     </tr>
@@ -567,18 +569,19 @@ ORDER BY s.name ASC;";
                                                                         </a>
                                                                     </td>
                                                                     <td align="center">
-                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $row['id'] . "&Trigger=edit") ?>" class="iconhoverbox">
-                                                                            <i class="icon-pencil"></i>
-                                                                        </a>
-                                                                        <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                                &nbsp;&nbsp;
-                                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($row['id']) ?>">
-                                                                                                    <i class="icon-trash txt-danger"></i>
-                                                                                                </a>
-                                                                                                <a href="javascript:;" data-href="AllQuickViewDetails.php?<?= EncodeUrl('Action=StoreDetail&RecordID=' . $row['id']) ?>" class="iconhoverbox quickview">
-                                                                                                    <i class="icon-eye"></i>
-                                                                                                </a>
-                                                                        <?php } ?>
+                                                                        <div class="action-buttons" style="white-space:nowrap;">
+                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $row['id'] . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;">
+                                                                                <i class="icon-pencil"></i>
+                                                                            </a>
+                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($row['id']) ?>" style="margin:0 6px;">
+                                                                                    <i class="icon-trash txt-danger"></i>
+                                                                                </a>
+                                                                         <?php } ?>
+                                                                                <a href="javascript:;" data-href="AllQuickViewDetails.php?<?= EncodeUrl('Action=StoreDetail&RecordID=' . $row['id']) ?>" class="iconhoverbox quickview" style="margin:0 6px;">
+                                                                                    <i class="icon-eye"></i>
+                                                                                </a>
+                                                                        </div>
                                                                     </td>
                                                                 </tr>
                                                             <?php

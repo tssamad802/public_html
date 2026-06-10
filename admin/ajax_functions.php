@@ -2067,15 +2067,13 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 
 		$result['success'] = 1;
 		$result['redirect'] = 'index.php?' . EncodeUrl('action=' . $action . '&SubLinkID=' . $SubLinkID);
+		// $result['sql'] = $Query;
 		$_SESSION['Message']['Msg'] = $Trigger == 'edit' ? NEWS_EDIT_SUCESSFULLY : NEWS_ADDED_SUCESSFULLY;
 		$_SESSION['Message']['Type'] = 2;
 	}
-
-	//  echo "<scrip></script>alert(" . json_encode($Query) . ");</script>";
-    // die();
-	//echo json_encode($query);
+	// print_r($Query);
+	// exit;
 	echo json_encode($result);
-	//echo "<script>alert(". json_encode($Query) . ");</script>";
 } else if ($ActionFlag == 'AddEditSlider') {
 	$TableName = "tblslider";
 

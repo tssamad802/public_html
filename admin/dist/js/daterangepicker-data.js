@@ -44,8 +44,6 @@ $(function () {
     },
   );
 
-  $(".singleDatePicker").attr("required", true);
-
   $(".singleDatePicker").daterangepicker({
     locale: {
       format: "YYYY-MM-DD",
@@ -55,10 +53,6 @@ $(function () {
     cancelClass: "btn-secondary",
   });
 
-  $("input[name='downVotes']").attr("required", true);
-
-  $(".singleDatePicker").attr("required", true);
- 
   $(".singleDatePicker").daterangepicker({
     locale: {
       format: "YYYY-MM-DD",
