@@ -32,6 +32,8 @@ $meta_data['Title'] = $website_config['MetaTitle'];
 $meta_data['Description'] = $website_config['MetaDescription'];
 $meta_data['Keywords'] = $website_config['MetaKeywords'];
 $meta_data['Others'] = '';
+// Initialize current page to avoid undefined variable warnings
+$currentpage = '';
 //end meta data
 
 // $_SESSION['TRA_LANG_SWITCH_CURL'] = genURLLangSwitch($_SESSION[TRA_FRONT_WEB_LANG]);//this is used to switch lang to avoid passing redirect link in url

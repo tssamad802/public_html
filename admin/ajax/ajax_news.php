@@ -76,16 +76,19 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
     // exit;
     // exit($sql);
 
-    $start = isset($_REQUEST['start']) && is_numeric($_REQUEST['start']) ? $_REQUEST['start'] : 1;
-    $pagination = new pagination($sql, 100, $start, $refresh_div, 'searchfrm');
-    $sql = $pagination->get_query();
-    $db->query($sql);
-    //$db->query($sql);
-//$RecordCount=0;
-// title="<?= TXT_EDIT_RECORD  "
-    $page_links = $pagination->get_linksDashoard("ajax_news.php?FireAction=listing&action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&");
-    $db->query($sql);
-    $RecordCount = ($start > 1) ? ($start - 1) * 101 : $start;
+    // current page (start) is the page number; default to 1
+    $start = isset($_REQUEST['start']) && is_numeric($_REQUEST['start']) ? max(1, (int) $_REQUEST['start']) : 1;
+    // allow configurable items per page via request (fallback to 100)
+    $per_page = isset($_REQUEST['per_page']) && is_numeric($_REQUEST['per_page']) ? max(1, (int) $_REQUEST['per_page']) : 100;
+
+    $pagination = new pagination($sql, $per_page, $start, $refresh_div, 'searchfrm');
+    $sql_page = $pagination->get_query();
+    $db->query($sql_page);
+
+    $page_links = $pagination->get_linksDashoard("ajax_news.php?FireAction=listing&action=" . ($_REQUEST['action'] ?? '') . "&SubLinkID=" . ($_REQUEST['SubLinkID'] ?? '') . "&");
+
+    // Record numbering start (serial number): calculate based on page and per-page
+    $RecordCount = ($start > 1) ? (($start - 1) * $per_page) + 1 : 1;
 
     if ($db->num_rows() > 0) {
         ?>
@@ -152,7 +155,7 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <div class="dataTables_paginate paging_simple_numbers" id="datable_1_paginate">
                                                     <?php echo $page_links; ?>
@@ -210,7 +213,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listinggallery
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -277,7 +280,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingvideoga
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -714,7 +717,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingevents'
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -805,7 +808,7 @@ INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where  $whereCond order
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -877,7 +880,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingslider'
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -941,7 +944,7 @@ where A.CourseID='" . $_REQUEST['ParentID'] . "' order by A.Sequence ASC";
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -1011,7 +1014,7 @@ order by B.Title" . LANG_SEP_DB . " ASC, A.BookName" . LANG_SEP_DB . " ASC";
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -1079,7 +1082,7 @@ order by A.TableID DESC";
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">
@@ -1134,7 +1137,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingpublica
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
     }
 
-    if ($pagination->tot_pages > 1) {
+    if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
                                                 <tr>
                                                     <td colspan="11">

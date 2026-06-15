@@ -490,9 +490,13 @@ function generatepassword($length)
 	}
 	return $password;
 }
-function redirect($url, $time)
+function redirect($url, $time = 0)
 {
-	echo '<meta http-equiv=refresh content=' . $time . ';URL=' . $url . '>';
+	if ($time <= 0) {
+		header("Location: $url");
+	} else {
+		echo '<meta http-equiv="refresh" content="' . $time . ';URL=' . $url . '">';
+	}
 	exit;
 }
 //Uploading with Thumbnailing

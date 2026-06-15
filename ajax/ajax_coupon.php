@@ -68,7 +68,9 @@ ORDER BY c.TableID DESC";
     $RecordCount=$pagelimit * ($start - 1);
 
     $perpageresult = $perPage->getAllPageLinks($rowcount,'/ajax/ajax_coupon.php?actions=couponlisting&page=','searchfrm','resultDiv');
-    //    print_r($perpageresult);
+    // echo "<script>console.log(" . json_encode($perpageresult) . ");</script>";
+        // print_r($queryproduct);
+        // exit;
     $Counterlisting = 0;
     if($db->num_rows() > 0)
     {
