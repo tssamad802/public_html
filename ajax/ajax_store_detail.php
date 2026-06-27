@@ -56,10 +56,10 @@ if($_REQUEST['actions'] == "couponlisting")
 
     $Query = "select * from tblstore where TableID = ".$StoreID." "; //and endDate >= CURDATE()
     $db1->query($Query);
-    if(isset($_REQUEST['data']))
-        $queryproduct = "select c.* , s.logo as StoreLogo , s.trackingUrl , s.webUrl as StoreWeb, s.Active, s.disableUrl from tblcoupon c inner join tblstore s on(s.TableID = c.StoreID) where  c.Active != 2 and StoreID = ".$StoreID." and endDate >= CURDATE() or endDate = '0000-00-00') order by FIELD (URLKeyword , '".$_REQUEST['data']."') DESC , Sequence ASC "; //and endDate >= CURDATE()
+    if(isset($_REQUEST['data']) && !empty($_REQUEST['data']))
+        $queryproduct = "select c.* , s.logo as StoreLogo , s.trackingUrl , s.webUrl as StoreWeb, s.Active, s.disableUrl from tblcoupon c inner join tblstore s on(s.TableID = c.StoreID) where c.Active != 2 and StoreID = ".$StoreID." and (endDate >= CURDATE() or endDate = '0000-00-00') order by FIELD (URLKeyword , '".$_REQUEST['data']."') DESC , Sequence ASC "; //and endDate >= CURDATE()
     else
-        $queryproduct = "select c.* , s.logo as StoreLogo , s.trackingUrl  , s.webUrl as StoreWeb, s.Active, s.disableUrl from tblcoupon c inner join tblstore s on(s.TableID = c.StoreID) where c.Active != 2  and StoreID = ".$StoreID." and endDate >= CURDATE() or endDate = '0000-00-00' order by Sequence ASC"; //and endDate >= CURDATE()
+        $queryproduct = "select c.* , s.logo as StoreLogo , s.trackingUrl  , s.webUrl as StoreWeb, s.Active, s.disableUrl from tblcoupon c inner join tblstore s on(s.TableID = c.StoreID) where c.Active != 2 and StoreID = ".$StoreID." and (endDate >= CURDATE() or endDate = '0000-00-00') order by Sequence ASC"; //and endDate >= CURDATE()
 
     $db->query($queryproduct);
     $rowcount = $db->num_rows();

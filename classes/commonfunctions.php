@@ -1552,8 +1552,10 @@ function checkExistingGroupPermission($PermissionType, $RoleID, $SubLinkID, $IsU
 
 function secureTextForDb($text)
 {
-	//$db_conn=mysqli_connect(DATABASE_HOST,DATABASE_USER, DATABASE_PASSWORD,DATABASE_NAME);
-	//$text = addslashes(strip_tags(mysqli_real_escape_string($db_conn,$text)));
+	if ($text === null) {
+		return '';
+	}
+	$text = strip_tags($text);
 	$text = addslashes($text);
 	return $text;
 }
@@ -1569,6 +1571,9 @@ function showFrontEndDescription($text)
 
 function ChekingTextForDb($text)
 {
+	if ($text === null) {
+		return false;
+	}
 	if (addslashes(strip_tags(mysql_real_escape_string($text)))) {
 		return false;
 	} else {
@@ -1578,6 +1583,9 @@ function ChekingTextForDb($text)
 
 function clearTextForDb($text)
 {
+	if ($text === null) {
+		return '';
+	}
 	$text = addslashes($text);
 
 	return $text;

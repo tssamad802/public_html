@@ -428,33 +428,30 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingstore')
     $filterActive = isset($_POST['active']) ? (int) $_POST['active'] : -1;
     $filterFeature = isset($_POST['feature']) ? (int) $_POST['feature'] : -1;
 
-    if ($_POST['name'] != '') {
-        $whereCond .= ' and s.name LIKE "%' . $_POST['name'] . '%"';
+    if (!empty($_POST['name'])) {
+        $whereCond .= ' and s.name LIKE "%' . secureTextForDb($_POST['name']) . '%"';
     }
 
-    if ($_POST['CountryID'] > 0) {
-        $whereCond .= ' and s.CountryID = "' . $_POST['CountryID'] . '"';
+    if (!empty($_POST['CountryID']) && (int)$_POST['CountryID'] > 0) {
+        $whereCond .= ' and s.CountryID = "' . (int) $_POST['CountryID'] . '"';
     }
-    if ($_POST['url'] != "") {
-        $whereCond .= ' and s.url = "' . $_POST['url'] . '"';
+    if (!empty($_POST['url'])) {
+        $whereCond .= ' and s.url = "' . secureTextForDb($_POST['url']) . '"';
     }
-    if ($_POST['discount'] != "") {
-        $whereCond .= ' and s.discount = "' . $_POST['discount'] . '"';
+    if (!empty($_POST['discount'])) {
+        $whereCond .= ' and s.discount = "' . secureTextForDb($_POST['discount']) . '"';
     }
-    if ($_POST['NetworkID'] > 0) {
-        $whereCond .= ' and s.NetworkID = "' . $_POST['NetworkID'] . '"';
+    if (!empty($_POST['NetworkID']) && (int)$_POST['NetworkID'] > 0) {
+        $whereCond .= ' and s.NetworkID = "' . (int) $_POST['NetworkID'] . '"';
     }
-    // if ($_POST['startDate'] != "") {
-    //     $whereCond .= ' and c.startDate = "' . $_POST['startDate'] . '"';
-    // }
     if (!empty($_POST['startDate'])) {
-        $whereCond .= ' and c.startDate = "' . $_POST['startDate'] . '"';
+        $whereCond .= ' and s.startDate = "' . secureTextForDb($_POST['startDate']) . '"';
     }
-    if ($_POST['CreatedBy'] > 0) {
-        $whereCond .= ' and s.CreatedBy = "' . $_POST['CreatedBy'] . '"';
+    if (!empty($_POST['CreatedBy']) && (int)$_POST['CreatedBy'] > 0) {
+        $whereCond .= ' and s.CreatedBy = "' . (int) $_POST['CreatedBy'] . '"';
     }
-    if ($_POST['ModifiedBy'] > 0) {
-        $whereCond .= ' and s.ModifiedBy = "' . $_POST['ModifiedBy'] . '"';
+    if (!empty($_POST['ModifiedBy']) && (int)$_POST['ModifiedBy'] > 0) {
+        $whereCond .= ' and s.ModifiedBy = "' . (int) $_POST['ModifiedBy'] . '"';
     }
     if ($filterActive > -1) {
         if ($filterActive == 0)
@@ -488,23 +485,8 @@ FROM tblstore s
 INNER JOIN tblcountry c ON (s.CountryID = c.TableID)
 INNER JOIN tblsystemusers u ON (u.TableID = s.CreatedBy)
 INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
-WHERE 1
-ORDER BY s.name ASC;";
-
-    // $sql = "SELECT
-//     s.TableID AS id,
-//     s.Name,
-//     s.Active AS active,
-//     s.CountryID,
-//     s.CreatedBy,
-//     s.NetworkID,
-//     u.Username AS CreatedByUser,
-//     n.Title AS NetName
-// FROM tblstore s
-// INNER JOIN tblcountry c ON s.CountryID = c.TableID
-// INNER JOIN tblsystemusers u ON s.CreatedBy = u.TableID
-// INNER JOIN tblnetwork n ON s.NetworkID = n.TableID
-// ORDER BY s.Name ASC";
+    WHERE 1 $whereCond
+    ORDER BY s.name ASC";
 
     // echo $sql;
     // exit;

@@ -1794,6 +1794,10 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 		$logoImageWidth = getWidth($_FILES['logo']['tmp_name']);
 		$logoImageHeight = getHeight($_FILES['logo']['tmp_name']);
 	}
+	else {
+		$logoImageWidth = 0;
+		$logoImageHeight = 0;
+	}
 	if ($URLKeywordDublicate > 0 && $RecordID != $URLKeywordDublicate && $Trigger == 'edit') {
 		$result['error'] = ERROR_PAGE_URL;
 	} else if ($NameDublicate > 0 && $RecordID != $NameDublicate) {
@@ -1818,38 +1822,38 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 		} else {
 			$Query = "insert into $TableName set   ";
 			$logaction = 1;
-			$_POST['MetaTitle'] = ($_POST['MetaTitle'] == "") ? $_POST['Title'] : $_POST['MetaTitle'];
-			$_POST['MetaTitleAr'] = ($_POST['MetaTitleAr'] == "") ? $_POST['TitleAr'] : $_POST['MetaTitleAr'];
+			$_POST['MetaTitle'] = (!empty($_POST['MetaTitle'])) ? $_POST['MetaTitle'] : (isset($_POST['Title']) ? $_POST['Title'] : '');
+			$_POST['MetaTitleAr'] = (!empty($_POST['MetaTitleAr'])) ? $_POST['MetaTitleAr'] : (isset($_POST['TitleAr']) ? $_POST['TitleAr'] : '');
 
 			sitemap($_POST['url'], date('Y-m-d'), '0.64');
 		}
 
-		$Query .= "name='" . secureTextForDb($_POST['name']) . "',
-					url='" . secureTextForDb($_POST['url']) . "', 
-					storeDate='" . secureTextForDb($_POST['storeDate']) . "', 
-					domain='" . secureTextForDb($_POST['domain']) . "' ,  
-					webUrl='" . secureTextForDb($_POST['webUrl']) . "' ,  
-					trackingUrl='" . secureTextForDb($_POST['trackingUrl']) . "' ,
-					Active='" . secureTextForDb($_POST['Active']) . "' ,  
-					ShowHome='" . secureTextForDb($_POST['ShowHome']) . "' ,  
-					CountryID='" . secureTextForDb($_POST['CountryID']) . "' ,  
-					NetworkID='" . secureTextForDb($_POST['NetworkID']) . "' ,  
-					storeIDActiveNetwork='" . secureTextForDb($_POST['storeIDActiveNetwork']) . "' ,  
-					CategoryID='" . secureTextForDb(implode(",", $_POST['CategoryID'])) . "' ,  
-					impressionCode='" . $_POST['impressionCode'] . "' ,   
-					discount='" . secureTextForDb($_POST['discount']) . "' , 
-					fbUrl='" . secureTextForDb($_POST['fbUrl']) . "' , 
-					votes='" . secureTextForDb($_POST['votes']) . "' ,
-					H1='" . secureTextForDb($_POST['H1']) . "' ,  
-					H2='" . secureTextForDb($_POST['H2']) . "' ,
-					about='" . secureTextForDb($_POST['aboutStore']) . "' ,  
-					description='" . secureTextForDb($_POST['description']) . "' ,
-					MetaTitle='" . secureTextForDb($_POST['MetaTitle']) . "' ,
-					MetaKeywords='" . secureTextForDb($_POST['MetaKeywords']) . "' ,
-					MetaDescription='" . secureTextForDb($_POST['MetaDescription']) . "' ,
-					SimilarStoreID='" . secureTextForDb(implode(",", $_POST['SimilarStore'])) . "' ,
-					storeAdd = '" . $_POST['storeAdd'] . "',
-					rating='" . secureTextForDb($_POST['rating']) . "' ";
+		$Query .= "name='" . secureTextForDb($_POST['name'] ?? '') . "',
+				url='" . secureTextForDb($_POST['url'] ?? '') . "', 
+				storeDate='" . secureTextForDb($_POST['storeDate'] ?? '') . "', 
+				domain='" . secureTextForDb($_POST['domain'] ?? '') . "' ,  
+				webUrl='" . secureTextForDb($_POST['webUrl'] ?? '') . "' ,  
+				trackingUrl='" . secureTextForDb($_POST['trackingUrl'] ?? '') . "' ,
+				Active='" . secureTextForDb($_POST['Active'] ?? '') . "' ,  
+				ShowHome='" . secureTextForDb($_POST['ShowHome'] ?? '') . "' ,  
+				CountryID='" . secureTextForDb($_POST['CountryID'] ?? '') . "' ,  
+				NetworkID='" . secureTextForDb($_POST['NetworkID'] ?? '') . "' ,  
+				storeIDActiveNetwork='" . secureTextForDb($_POST['storeIDActiveNetwork'] ?? '') . "' ,  
+				CategoryID='" . secureTextForDb(isset($_POST['CategoryID']) ? implode(",", (array)$_POST['CategoryID']) : '') . "' ,  
+				impressionCode='" . secureTextForDb($_POST['impressionCode'] ?? '') . "' ,   
+				discount='" . secureTextForDb($_POST['discount'] ?? '') . "' , 
+				fbUrl='" . secureTextForDb($_POST['fbUrl'] ?? '') . "' , 
+				votes='" . secureTextForDb($_POST['votes'] ?? '') . "' ,
+				H1='" . secureTextForDb($_POST['H1'] ?? '') . "' ,  
+				H2='" . secureTextForDb($_POST['H2'] ?? '') . "' ,
+				about='" . secureTextForDb($_POST['aboutStore'] ?? '') . "' ,  
+				description='" . secureTextForDb($_POST['description'] ?? '') . "' ,
+				MetaTitle='" . secureTextForDb($_POST['MetaTitle'] ?? '') . "' ,
+				MetaKeywords='" . secureTextForDb($_POST['MetaKeywords'] ?? '') . "' ,
+				MetaDescription='" . secureTextForDb($_POST['MetaDescription'] ?? '') . "' ,
+				SimilarStoreID='" . secureTextForDb(isset($_POST['SimilarStore']) ? implode(",", (array)$_POST['SimilarStore']) : '') . "' ,
+				storeAdd = '" . secureTextForDb($_POST['storeAdd'] ?? '') . "',
+				rating='" . secureTextForDb($_POST['rating'] ?? '') . "' ";
 
 		if ($_POST['URLKeyword'] == '') {
 			$URLKeyword = $_POST['URLKeyword'];
@@ -2073,7 +2077,7 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 	}
 	// print_r($Query);
 	// exit;
-	echo json_encode($result);
+	echo json_encode($_POST);
 } else if ($ActionFlag == 'AddEditSlider') {
 	$TableName = "tblslider";
 
@@ -2144,7 +2148,7 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 		$_SESSION['Message']['Type'] = 2;
 	}
 
-	echo json_encode($result);
+	echo json_encode($_POST);
 	//echo "<script>alert(". json_encode($result) . ");</script>";
 } else if ($ActionFlag == 'AddEditPublicationForm') {
 	$TableName = "tblpolicy";

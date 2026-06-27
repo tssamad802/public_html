@@ -32,7 +32,7 @@ while($obj->next_record()){
     <div class="container">
 
         <div class="widget m-t-20">
-            <!-- /widget heading -->cx  
+            <!-- /widget heading -->
             <div class="widget-heading">
                 <h3 class="widget-title text-dark">
                     Featured Stores

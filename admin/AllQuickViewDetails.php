@@ -313,7 +313,7 @@ if($_REQUEST['Action']=="TestDetails")
                         </tr>
                         <tr>
                             <th>Total Coupon</th>
-                            <td scope="row"><?=($TotalCoupon['Total'] > 0 ? $TotalCoupon['Total'] : '0')?></td>
+                            <td scope="row"><?=(is_array($TotalCoupon) && !empty($TotalCoupon) ? array_values($TotalCoupon)[0] : ($TotalCoupon > 0 ? $TotalCoupon : '0'))?></td>
                         </tr>
 
                         </thead>
