@@ -490,9 +490,33 @@ INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
 
     // echo $sql;
     // exit;
-    $db->query($sql);
+    $start = isset($_REQUEST['start']) && is_numeric($_REQUEST['start'])
+        ? max(1, (int) $_REQUEST['start'])
+        : 1;
 
-    $RecordCount = 0;
+    $per_page = isset($_REQUEST['per_page']) && is_numeric($_REQUEST['per_page'])
+        ? max(1, (int) $_REQUEST['per_page'])
+        : 20;
+
+    $pagination = new pagination(
+        $sql,
+        $per_page,
+        $start,
+        $refresh_div,
+        'searchfrm'
+    );
+
+    $sql_page = $pagination->get_query();
+    $db->query($sql_page);
+
+    $page_links = $pagination->get_linksDashoard(
+        "ajax_news.php?FireAction=listingstore&action=" . ($_REQUEST['action'] ?? '') . "&SubLinkID=" . ($_REQUEST['SubLinkID'] ?? '') . "&"
+    );
+
+    $RecordCount = ($start > 1)
+        ? (($start - 1) * $per_page) + 1
+        : 1;
+
     if ($db->num_rows() > 0) {
         ?>
 
@@ -507,70 +531,54 @@ INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
                                                         <th width="8%" align="center">Status</th>
                                                         <th width="8%" align="center">Date</th>
                                                           <th width="8%" align="center">Created By</th>
-                                        <!--                <th width="8%" align="center">Update</th>-->
-                                        <!--                  <th width="8%" align="center">Updated By</th>-->
                                                           <th width="8%" align="center">Sort</th>
                                                         <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
                                                       </tr>
                                                     </thead>
                                                 <tbody >
                                             <?php
-                                            //echo $db->next_Record();
-                                    
-                                            // Step 1: Fetch all records into an array
-                                            $records = [];
                                             while ($db->next_Record()) {
-                                                $records[] = $db->Record; // store each row (assuming $db->Record is the associative array)
-                                                //echo "<script>console.log(" . json_encode($records) . ");</script>";
-                                            }
-
-                                            // Step 2: Loop using a for loop
-                                            $RecordCount = 0;
-                                            $total = count($records);
-                                            for ($i = 0; $i < $total; $i++) {
-                                                $row = $records[$i];
-                                                $RecordCount++;
-
-                                                $Status = ($row['active'] == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($row['active'] == 1) ? 'badge-success' : 'badge-danger';
-                                                $StatusTracking = ($row['trackingUrl'] != "") ? 'Yes' : 'No';
+                                                $Status = ($db->f('active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                $StatusClass = ($db->f('active') == 1) ? 'badge-success' : 'badge-danger';
+                                                $StatusTracking = ($db->f('trackingUrl') != "") ? 'Yes' : 'No';
                                                 ?>
                                                                 <tr>
                                                                     <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                    <td align="center"><?= $row['name'] ?></td>
+                                                                    <td align="center"><?= $db->f('name') ?></td>
                                                                     <td align="center"><?= $StatusTracking ?></td>
-                                                                    <td align="center"><?= $row['NetName'] ?></td>
-                                                                    <td align="center"><?= ($row['logo'] != null) ? "Yes" : "No" ?></td>
+                                                                    <td align="center"><?= $db->f('NetName') ?></td>
+                                                                    <td align="center"><?= ($db->f('logo') != null) ? "Yes" : "No" ?></td>
                                                                     <td align="center">
-                                                                        <span id="<?= (int) $row['id'] ?>" class="badge <?= $StatusClass ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $row['id'] ?>)">
+                                                                        <span id="<?= (int) $db->f('id') ?>" class="badge <?= $StatusClass ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $db->f('id') ?>)">
                                                                             <?= $Status ?>
                                                                         </span>
                                                                     </td>
-                                                                    <td align="center"><?= onlydateshortformat($row['storeDate']) ?></td>
-                                                                    <td align="center"><?= $row['FullName'] ?></td>
+                                                                    <td align="center"><?= onlydateshortformat($db->f('storeDate')) ?></td>
+                                                                    <td align="center"><?= $db->f('FullName') ?></td>
                                                                     <td align="center">
-                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=SortRecord&RecordID=" . $row['id'] . "&Trigger=edit") ?>" class="iconhoverbox" >
+                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=SortRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" >
                                                                             <img src="../admin/images/sort.png">
                                                                         </a>
                                                                     </td>
                                                                     <td align="center">
                                                                         <div class="action-buttons" style="white-space:nowrap;">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $row['id'] . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;">
+                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;">
                                                                                 <i class="icon-pencil"></i>
                                                                             </a>
                                                                          <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($row['id']) ?>" style="margin:0 6px;">
+                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>" style="margin:0 6px;">
                                                                                     <i class="icon-trash txt-danger"></i>
                                                                                 </a>
                                                                          <?php } ?>
-                                                                                <a href="javascript:;" data-href="AllQuickViewDetails.php?<?= EncodeUrl('Action=StoreDetail&RecordID=' . $row['id']) ?>" class="iconhoverbox quickview" style="margin:0 6px;">
+                                                                                <a href="javascript:;" data-href="AllQuickViewDetails.php?<?= EncodeUrl('Action=StoreDetail&RecordID=' . $db->f('id')) ?>" class="iconhoverbox quickview" style="margin:0 6px;">
                                                                                     <i class="icon-eye"></i>
                                                                                 </a>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
                                                             <?php
-                                            } // end for loop
+                                                $RecordCount++;
+                                            }
                                             ?>
 
                                         </tbody>
@@ -583,6 +591,23 @@ INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
                                             </script>
     
                                         <?php
+    }
+    if ($RecordCount == 0) {
+        echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
+    }
+
+    if (isset($pagination) && $pagination->tot_pages > 1) {
+        ?>
+<tr>
+    <td colspan="11">
+        <center>
+            <?php echo $page_links ?? ''; ?>
+        </center>
+    </td>
+</tr>
+<?php
+    }
+}
 
                                         // 	while($db->next_Record())
 // 	{
@@ -620,24 +645,7 @@ INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
                                             //} ?>
                                             <!--	</tbody>-->
                                             <!--</table>-->
-                                            <?php
-    }
-    if ($RecordCount == 0) {
-        echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
-    }
-
-   if (isset($pagination) && $pagination->tot_pages > 1) {
-?>
-<tr>
-    <td colspan="11">
-        <center>
-            <?php echo $page_links ?? ''; ?>
-        </center>
-    </td>
-</tr>
 <?php
-}
-}
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingevents') {
     $TableName = "tblevents";
     $refresh_div = 'resultDiv';
