@@ -13,7 +13,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
     $postValue = function ($key, $default = '') {
         return $_POST[$key] ?? $default;
     };
-    
+
 
     if ($postValue('CouponName') != '') {
         $whereCond .= ' and c.CouponName LIKE "%' . secureTextForDb($postValue('CouponName')) . '%"';
@@ -55,7 +55,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
             $whereCond .= ' and c.featured = 0';
     }
 
-    
+
     $TableName = "tblcoupon";
     $refresh_div = 'resultDiv';
 
@@ -63,10 +63,15 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listing') {
 // INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`) 
 // INNER JOIN  `tblsystemusers` u ON (u.`TableID` = c.`CreatedBy` ) where 1 $whereCond order  by s.name, c.Sequence";
 
-    $sql = "SELECT *,
-c.`TableID` AS id,
+  $sql = "SELECT
+c.TableID AS id,
+c.CouponName,
+c.couponCode,
+c.startDate,
+c.endDate,
 c.Active AS active,
-s.name AS storeName
+s.name AS storeName,
+u.FullName
 FROM tblcoupon c
 INNER JOIN tblstore s ON (c.StoreID = s.TableID)
 INNER JOIN tblsystemusers u ON (u.TableID = c.CreatedBy)
@@ -95,64 +100,67 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
 
     if ($db->num_rows() > 0) {
         ?>
-                                            <table class="table table-hover w-100 display pb-30 dataTable" >
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="10" align="center" ><?= SNO ?></th>
-                                                        <th align="center">Store</th>
-                                                        <th align="left">Name</th>
-                                                        <th align="right" style="text-align:right;">Code</th>
-                                                     <!--   <th align="center" style="text-align:center;">Tracking</th>-->
-                                                            <!--<th align="center">Logo</th>-->
-                                                        <th align="center">Init</th>
-                                                        <th align="center">Expire</th>
-                                        <!--                  <th width="8%" align="center">Date</th>-->
-                                                        <th align="center">Status</th>
-                                                        <th align="center">Add By</th>
-                                        <!--                  <th width="8%" align="center">Update By</th>-->
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody >
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                //	$RecordCount++;
-                                                // print_r($db->Record);
-                                                $Status = ($db->f('active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('active') == 1) ? 'badge-success' : 'badge-danger';
-                                                //      <td align="center">//=onlydateshortformat($db->f('CreatedDateTime'))<!--</td>-->
+                                                    <table class="table table-hover w-100 display pb-30 dataTable" >
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="10" align="center" ><?= SNO ?></th>
+                                                                <th align="center">Store</th>
+                                                                <th align="left">Name</th>
+                                                                <th align="right" style="text-align:right;">Code</th>
+                                                             <!--   <th align="center" style="text-align:center;">Tracking</th>-->
+                                                                    <!--<th align="center">Logo</th>-->
+                                                                <th align="center">Init</th>
+                                                                <th align="center">Expire</th>
+                                                <!--                  <th width="8%" align="center">Date</th>-->
+                                                                <th align="center">Status</th>
+                                                                <th align="center">Add By</th>
+                                                <!--                  <th width="8%" align="center">Update By</th>-->
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody >
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        //	$RecordCount++;
+                                                        // print_r($db->Record);
+                                                        $Status = ($db->f('active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        //      <td align="center">//=onlydateshortformat($db->f('CreatedDateTime'))<!--</td>-->
 //        <td align="right">//=$db->f('FullName')<!--</td>-->
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('id') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="center"><?= $db->f('storeName') ?></td>
-                                                                        <td align="center"><?= $db->f('CouponName') ?></td>
-                                                                        <td align="center"><?= $db->f('couponCode') ?></td>
-                                                                        <!--<td align="center"><?= ($db->f('trackingLink') != "") ? "Yes" : "No" ?></td>-->
-                                                                        <!--<td align="center"><?= ($db->f('logo') != "") ? "Yes" : "No" ?></td>-->
-                                                                        <td align="center"><?= onlydateshortformat($db->f('startDate')) ?></td>
-                                                                        <td align="center"><?= onlydateshortformat($db->f('endDate')) ?></td>
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('id') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="center"><?= $db->f('storeName') ?></td>
+                                                                                    <td align="center"><?= $db->f('CouponName') ?></td>
+                                                                                    <td align="center"><?= $db->f('couponCode') ?></td>
+                                                                                    <!--<td align="center"><?= ($db->f('trackingLink') != "") ? "Yes" : "No" ?></td>-->
+                                                                                    <!--<td align="center"><?= ($db->f('logo') != "") ? "Yes" : "No" ?></td>-->
+                                                                                    <td align="center"><?= onlydateshortformat($db->f('startDate')) ?></td>
+                                                                                    <td align="center"><?= onlydateshortformat($db->f('endDate')) ?></td>
 
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="c<?= $db->f('id') ?>" onclick="UpdateCouponActive(<?= json_encode($Status) ?>, <?= (int) $db->f('id') ?>)"><?= $Status ?></span></td>
-                                                                        <td align="center"><?= $db->f('FullName') ?></td>
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="c<?= $db->f('id') ?>" onclick="UpdateCouponActive(<?= json_encode($Status) ?>, <?= (int) $db->f('id') ?>)"><?= $Status ?></span></td>
+                                                                                    <td align="center"><?= $db->f('FullName') ?></td>
 
-                                                                        <td align="center">
-                                                                            <div class="action-buttons" style="white-space:nowrap;">
-                                                                                <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;"> <i class="icon-pencil"></i> </a>
-                                                                             <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                     <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>" style="margin:0 6px;"> <i class="icon-trash txt-danger"></i> </a>
-                                                                             <?php } ?>
-                                                                                     <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=CouponDetail&RecordID=' . $db->f('id')); ?>" class="iconhoverbox quickview" style="margin:0 6px;"><i class="icon-eye"></i></a>
-                                                                            </div>
-                                                                        </td>
+                                                                                    <td align="center">
+                                                                                        <div class="action-buttons" style="white-space:nowrap;">
+                                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;"> <i class="icon-pencil"></i> </a>
+                                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                     <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>" style="margin:0 6px;"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                         <?php } ?>
+                                                                                                 <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=CouponDetail&RecordID=' . $db->f('id')); ?>" class="iconhoverbox quickview" style="margin:0 6px;"><i class="icon-eye"></i></a>
+                                                                                        </div>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                                                $RecordCount++;
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                                            $RecordCount++;
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <script type="text/javascript">
+            $(".loader-div").hide(); // jab data aa jaye to loader chupa dein
+        </script>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -160,10 +168,10 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <div class="dataTables_paginate paging_simple_numbers" id="datable_1_paginate">
-                                                    <?php echo $page_links; ?>
-                                                </div>
-                                            <?php
+                                                        <div class="dataTables_paginate paging_simple_numbers" id="datable_1_paginate">
+                                                            <?php echo $page_links; ?>
+                                                        </div>
+                                                    <?php
     }
 }
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listinggallery') {
@@ -176,41 +184,41 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listinggallery
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left"><?= IMAGES ?></th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>" >
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left"><?= IMAGES ?></th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>" >
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
 
-                                                /*$BannerImage = "-";
-                                                if($db->f('BannerImage')!='')
-                                                {
-                                                    $BannerImage = GallaryImageHtml('../'.FILES_FOLDER.'/'.DOCUMENT_FOLDER.'/'.$db->f('BannerImage'));
-                                                }*/
+                                                        /*$BannerImage = "-";
+                                                        if($db->f('BannerImage')!='')
+                                                        {
+                                                            $BannerImage = GallaryImageHtml('../'.FILES_FOLDER.'/'.DOCUMENT_FOLDER.'/'.$db->f('BannerImage'));
+                                                        }*/
 
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="left"><img src="<?= '../' . FILES_FOLDER . '/' . THUMBNAIL_IMAGES . '/thumbnail_' . $db->f('Name') ?>" height="80" /></td>
-                                                                        <td align="center">
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="left"><img src="<?= '../' . FILES_FOLDER . '/' . THUMBNAIL_IMAGES . '/thumbnail_' . $db->f('Name') ?>" height="80" /></td>
+                                                                                    <td align="center">
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -218,14 +226,14 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listinggallery
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 
@@ -239,45 +247,45 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingvideoga
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left"><?= IMAGES ?></th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>" >
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $BannerImage = "-";
-                                                if ($db->f("VideoType") == 2) {
-                                                    $Thumnbanil = '<video  preload="metadata" width="200" height="100">
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left"><?= IMAGES ?></th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>" >
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $BannerImage = "-";
+                                                        if ($db->f("VideoType") == 2) {
+                                                            $Thumnbanil = '<video  preload="metadata" width="200" height="100">
 							  <source src="' . RESOURCES_DOMAIN . '/' . FILES_FOLDER . "/" . UPLOAD_VIDEOS . '/' . $db->f('FileName') . '" type="video/mp4">
 							</video>';
-                                                } else {
-                                                    $v_Value = PareYouTubeLink($db->f('FileName'));
-                                                    //$Thumnbanil = '<iframe width="200" height="100" src="http://www.youtube.com/embed/'.$v_Value.'?rel=0&amp;wmode=transparent"></iframe>';
-                                                    $Thumnbanil = '<img src="http://img.youtube.com/vi/' . $v_Value . '/mqdefault.jpg" height="100" />';
-                                                }
+                                                        } else {
+                                                            $v_Value = PareYouTubeLink($db->f('FileName'));
+                                                            //$Thumnbanil = '<iframe width="200" height="100" src="http://www.youtube.com/embed/'.$v_Value.'?rel=0&amp;wmode=transparent"></iframe>';
+                                                            $Thumnbanil = '<img src="http://img.youtube.com/vi/' . $v_Value . '/mqdefault.jpg" height="100" />';
+                                                        }
 
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="left"><?= $Thumnbanil ?></td>
-                                                                        <td align="center">
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="left"><?= $Thumnbanil ?></td>
+                                                                                    <td align="center">
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -285,14 +293,14 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingvideoga
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 
@@ -300,128 +308,128 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'sortstore') {
 
     ?>
 
-                    <script type="text/javascript">
-                        //alert('Test');
-                        //const element = document.getElementById("printdivbox");
-                        //element.remove();
+                        <script type="text/javascript">
+                            //alert('Test');
+                            //const element = document.getElementById("printdivbox");
+                            //element.remove();
     
     
-                        //const element = document.getElementByClassName("preloader-it");
-                        //element.remove();    
-                        //document.getElementByClassName('preloader-it').style.display = "none":
+                            //const element = document.getElementByClassName("preloader-it");
+                            //element.remove();    
+                            //document.getElementByClassName('preloader-it').style.display = "none":
     
-                    </script>
+                        </script>
 
 
-                    <?php
+                        <?php
 
-                    //start search
-                    $whereCond = '';
-                    $filterActive = isset($_POST['active']) ? (int) $_POST['active'] : -1;
-                    $filterFeature = isset($_POST['feature']) ? (int) $_POST['feature'] : -1;
+                        //start search
+                        $whereCond = '';
+                        $filterActive = isset($_POST['active']) ? (int) $_POST['active'] : -1;
+                        $filterFeature = isset($_POST['feature']) ? (int) $_POST['feature'] : -1;
 
-                    if ($_POST['name'] != '') {
-                        $whereCond .= ' and s.name LIKE "%' . $_POST['name'] . '%"';
-                    }
+                        if ($_POST['name'] != '') {
+                            $whereCond .= ' and s.name LIKE "%' . $_POST['name'] . '%"';
+                        }
 
-                    if ($_POST['CountryID'] > 0) {
-                        $whereCond .= ' and s.CountryID = "' . $_POST['CountryID'] . '"';
-                    }
-                    if ($_POST['url'] != "") {
-                        $whereCond .= ' and s.url = "' . $_POST['url'] . '"';
-                    }
-                    if ($_POST['discount'] != "") {
-                        $whereCond .= ' and s.discount = "' . $_POST['discount'] . '"';
-                    }
-                    if ($_POST['NetworkID'] > 0) {
-                        $whereCond .= ' and s.NetworkID = "' . $_POST['NetworkID'] . '"';
-                    }
-                    if ($_POST['startDate'] != "") {
-                        $whereCond .= ' and c.startDate = "' . $_POST['startDate'] . '"';
-                    }
-                    if ($_POST['CreatedBy'] > 0) {
-                        $whereCond .= ' and s.CreatedBy = "' . $_POST['CreatedBy'] . '"';
-                    }
-                    if ($_POST['ModifiedBy'] > 0) {
-                        $whereCond .= ' and s.ModifiedBy = "' . $_POST['ModifiedBy'] . '"';
-                    }
-                    if ($filterActive > -1) {
-                        if ($filterActive == 0)
-                            $whereCond .= ' and s.Active = 0';
-                        if ($filterActive == 1)
-                            $whereCond .= ' and s.Active = 1';
-                        if ($filterActive == 2)
-                            $whereCond .= ' and s.Active = 2';
-                    }
-                    if ($filterFeature > 0) {
-                        if ($filterFeature == 1)
-                            $whereCond .= ' and s.featured = 1';
-                        if ($filterFeature == 0)
-                            $whereCond .= ' and s.featured = 0';
-                    }
+                        if ($_POST['CountryID'] > 0) {
+                            $whereCond .= ' and s.CountryID = "' . $_POST['CountryID'] . '"';
+                        }
+                        if ($_POST['url'] != "") {
+                            $whereCond .= ' and s.url = "' . $_POST['url'] . '"';
+                        }
+                        if ($_POST['discount'] != "") {
+                            $whereCond .= ' and s.discount = "' . $_POST['discount'] . '"';
+                        }
+                        if ($_POST['NetworkID'] > 0) {
+                            $whereCond .= ' and s.NetworkID = "' . $_POST['NetworkID'] . '"';
+                        }
+                        if ($_POST['startDate'] != "") {
+                            $whereCond .= ' and c.startDate = "' . $_POST['startDate'] . '"';
+                        }
+                        if ($_POST['CreatedBy'] > 0) {
+                            $whereCond .= ' and s.CreatedBy = "' . $_POST['CreatedBy'] . '"';
+                        }
+                        if ($_POST['ModifiedBy'] > 0) {
+                            $whereCond .= ' and s.ModifiedBy = "' . $_POST['ModifiedBy'] . '"';
+                        }
+                        if ($filterActive > -1) {
+                            if ($filterActive == 0)
+                                $whereCond .= ' and s.Active = 0';
+                            if ($filterActive == 1)
+                                $whereCond .= ' and s.Active = 1';
+                            if ($filterActive == 2)
+                                $whereCond .= ' and s.Active = 2';
+                        }
+                        if ($filterFeature > 0) {
+                            if ($filterFeature == 1)
+                                $whereCond .= ' and s.featured = 1';
+                            if ($filterFeature == 0)
+                                $whereCond .= ' and s.featured = 0';
+                        }
 
 
-                    $TableName = "tblcoupon";
-                    $refresh_div = 'resultDiv';
-                    $whereCond = "s.`TableID` = " . $_REQUEST['RecordID'] . "  and c.endDate >= CURDATE()";//
+                        $TableName = "tblcoupon";
+                        $refresh_div = 'resultDiv';
+                        $whereCond = "s.`TableID` = " . $_REQUEST['RecordID'] . "  and c.endDate >= CURDATE()";//
 //$sql="select * from  $TableName order by storeDate DESC";
-                    $sql = "SELECT c.* ,s.name as name ,s.Active active , s.`TableID` AS id ,c.TableID as TableID , c.couponName CouponName , c.endDate date FROM tblcoupon c 
-INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)  where $whereCond order by c.SEQUENCE ASC";          
+                        $sql = "SELECT c.* ,s.name as name ,s.Active active , s.`TableID` AS id ,c.TableID as TableID , c.couponName CouponName , c.endDate date FROM tblcoupon c 
+INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`)  where $whereCond order by c.SEQUENCE ASC";
 
-                    // echo $sql;
-                
-                    // exit;
-                 
-                    $db->query($sql);
-                    $RecordCount = 0;
-                    if ($db->num_rows() > 0) {                                   
-                        ?>
-                                                <table id="couponSorting" class="table table-hover w-100 display pb-30 sort-table"> <!-- removed id datatable_1 -->
-                                                    <thead>
-                                                    <tr>                                                                                                                              
-                                        <!--                <th width="4%" align="center" >--><?//=SNO ?><!--</th>-->
-                                                        <th align="left">Coupon Name</th>
-                                                        <th align="left">Coupon Class</th>
-                                                        <th width="8%" align="center">Sort</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                                    <?php
+                        // echo $sql;
+                    
+                        // exit;
+                    
+                        $db->query($sql);
+                        $RecordCount = 0;
+                        if ($db->num_rows() > 0) {
+                            ?>
+                                                        <table id="couponSorting" class="table table-hover w-100 display pb-30 sort-table"> <!-- removed id datatable_1 -->
+                                                            <thead>
+                                                            <tr>                                                                                                                              
+                                                <!--                <th width="4%" align="center" >--><?//=SNO ?><!--</th>-->
+                                                                <th align="left">Coupon Name</th>
+                                                                <th align="left">Coupon Class</th>
+                                                                <th width="8%" align="center">Sort</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                            <?php
 
-                                                    while ($db->next_Record()) {
-                                                        $RecordCount++;
-                                                        $Status = ($db->f('active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                        $StatusClass = ($db->f('active') == 1) ? 'badge-success' : 'badge-danger';
-                                                        if ($RecordCount == 1)
-                                                            echo "Store Name : " . $db->f('name');
-                                                        ?>
-                                                                            <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                            <!--                    <td class="line-height" align="center">--><?//=$RecordCount ?><!--</td>-->
-                                                                                <td align="left"><?= $db->f('CouponName') ?></td>
-                                                                                <td align="left"><?= $db->f('couponClassification') ?></td>
-                                                                                <td align="center"><a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=SortRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <img src="../admin/images/sort.png"> </a></td>
-                                                                            </tr>
-                                                                            <?php
-                                                    } ?>
-                                                    </tbody>
-                                                </table>
-                                                <?php
-                    }
-                    if ($RecordCount == 0) {
-                        echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
-                    }
+                                                            while ($db->next_Record()) {
+                                                                $RecordCount++;
+                                                                $Status = ($db->f('active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                                $StatusClass = ($db->f('active') == 1) ? 'badge-success' : 'badge-danger';
+                                                                if ($RecordCount == 1)
+                                                                    echo "Store Name : " . $db->f('name');
+                                                                ?>
+                                                                                        <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                        <!--                    <td class="line-height" align="center">--><?//=$RecordCount ?><!--</td>-->
+                                                                                            <td align="left"><?= $db->f('CouponName') ?></td>
+                                                                                            <td align="left"><?= $db->f('couponClassification') ?></td>
+                                                                                            <td align="center"><a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=SortRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <img src="../admin/images/sort.png"> </a></td>
+                                                                                        </tr>
+                                                                                        <?php
+                                                            } ?>
+                                                            </tbody>
+                                                        </table>
+                                                        <?php
+                        }
+                        if ($RecordCount == 0) {
+                            echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
+                        }
 
-                    if ($pagination->tot_pages > 1) {
-                        ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                            <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
-                    }
+                        if ($pagination->tot_pages > 1) {
+                            ?>
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                    <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
+                        }
 }
 
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingstore') {
@@ -435,7 +443,7 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingstore')
         $whereCond .= ' and s.name LIKE "%' . secureTextForDb($_POST['name']) . '%"';
     }
 
-    if (!empty($_POST['CountryID']) && (int)$_POST['CountryID'] > 0) {
+    if (!empty($_POST['CountryID']) && (int) $_POST['CountryID'] > 0) {
         $whereCond .= ' and s.CountryID = "' . (int) $_POST['CountryID'] . '"';
     }
     if (!empty($_POST['url'])) {
@@ -444,16 +452,16 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingstore')
     if (!empty($_POST['discount'])) {
         $whereCond .= ' and s.discount = "' . secureTextForDb($_POST['discount']) . '"';
     }
-    if (!empty($_POST['NetworkID']) && (int)$_POST['NetworkID'] > 0) {
+    if (!empty($_POST['NetworkID']) && (int) $_POST['NetworkID'] > 0) {
         $whereCond .= ' and s.NetworkID = "' . (int) $_POST['NetworkID'] . '"';
     }
     if (!empty($_POST['startDate'])) {
         $whereCond .= ' and s.startDate = "' . secureTextForDb($_POST['startDate']) . '"';
     }
-    if (!empty($_POST['CreatedBy']) && (int)$_POST['CreatedBy'] > 0) {
+    if (!empty($_POST['CreatedBy']) && (int) $_POST['CreatedBy'] > 0) {
         $whereCond .= ' and s.CreatedBy = "' . (int) $_POST['CreatedBy'] . '"';
     }
-    if (!empty($_POST['ModifiedBy']) && (int)$_POST['ModifiedBy'] > 0) {
+    if (!empty($_POST['ModifiedBy']) && (int) $_POST['ModifiedBy'] > 0) {
         $whereCond .= ' and s.ModifiedBy = "' . (int) $_POST['ModifiedBy'] . '"';
     }
     if ($filterActive > -1) {
@@ -476,13 +484,18 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingstore')
     $refresh_div = 'resultDiv';
 
     $sql = "select * from  $TableName order by storeDate DESC";
-//     $sql = "SELECT * ,s.Active active , s.`TableID` AS id , n.Title as NetName FROM tblstore s 
+    //     $sql = "SELECT * ,s.Active active , s.`TableID` AS id , n.Title as NetName FROM tblstore s 
 // INNER JOIN `tblcountry` c ON (s.`CountryID` = c.`TableID`) 
 // INNER JOIN `tblsystemusers` u ON (u.`TableID` = s.`CreatedBy`) 
 // INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where 1 $whereCond order by name ASC";
-$sql = "SELECT *,
-s.Active AS active,
+    $sql = "SELECT
 s.TableID AS id,
+s.name,
+s.trackingUrl,
+s.logo,
+s.Active AS active,
+s.storeDate,
+u.FullName,
 n.Title AS NetName
 FROM tblstore s
 INNER JOIN tblcountry c ON (s.CountryID = c.TableID)
@@ -523,77 +536,77 @@ INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
     if ($db->num_rows() > 0) {
         ?>
 
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left">Name</th>
-                                                        <th align="center" style="text-align:center;">Tracking</th>
-                                                        <th width="8%" align="center">Network</th>
-                                                        <th width="8%" align="center">Logo</th>
-                                                        <th width="8%" align="center">Status</th>
-                                                        <th width="8%" align="center">Date</th>
-                                                          <th width="8%" align="center">Created By</th>
-                                                          <th width="8%" align="center">Sort</th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody >
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $Status = ($db->f('active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('active') == 1) ? 'badge-success' : 'badge-danger';
-                                                $StatusTracking = ($db->f('trackingUrl') != "") ? 'Yes' : 'No';
-                                                ?>
-                                                                <tr>
-                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                    <td align="center"><?= $db->f('name') ?></td>
-                                                                    <td align="center"><?= $StatusTracking ?></td>
-                                                                    <td align="center"><?= $db->f('NetName') ?></td>
-                                                                    <td align="center"><?= ($db->f('logo') != null) ? "Yes" : "No" ?></td>
-                                                                    <td align="center">
-                                                                        <span id="<?= (int) $db->f('id') ?>" class="badge <?= $StatusClass ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $db->f('id') ?>)">
-                                                                            <?= $Status ?>
-                                                                        </span>
-                                                                    </td>
-                                                                    <td align="center"><?= onlydateshortformat($db->f('storeDate')) ?></td>
-                                                                    <td align="center"><?= $db->f('FullName') ?></td>
-                                                                    <td align="center">
-                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=SortRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" >
-                                                                            <img src="../admin/images/sort.png">
-                                                                        </a>
-                                                                    </td>
-                                                                    <td align="center">
-                                                                        <div class="action-buttons" style="white-space:nowrap;">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;">
-                                                                                <i class="icon-pencil"></i>
-                                                                            </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>" style="margin:0 6px;">
-                                                                                    <i class="icon-trash txt-danger"></i>
-                                                                                </a>
-                                                                         <?php } ?>
-                                                                                <a href="javascript:;" data-href="AllQuickViewDetails.php?<?= EncodeUrl('Action=StoreDetail&RecordID=' . $db->f('id')) ?>" class="iconhoverbox quickview" style="margin:0 6px;">
-                                                                                    <i class="icon-eye"></i>
-                                                                                </a>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php
-                                                $RecordCount++;
-                                            }
-                                            ?>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left">Name</th>
+                                                                <th align="center" style="text-align:center;">Tracking</th>
+                                                                <th width="8%" align="center">Network</th>
+                                                                <th width="8%" align="center">Logo</th>
+                                                                <th width="8%" align="center">Status</th>
+                                                                <th width="8%" align="center">Date</th>
+                                                                  <th width="8%" align="center">Created By</th>
+                                                                  <th width="8%" align="center">Sort</th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody >
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $Status = ($db->f('active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        $StatusTracking = ($db->f('trackingUrl') != "") ? 'Yes' : 'No';
+                                                        ?>
+                                                                            <tr>
+                                                                                <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                <td align="center"><?= $db->f('name') ?></td>
+                                                                                <td align="center"><?= $StatusTracking ?></td>
+                                                                                <td align="center"><?= $db->f('NetName') ?></td>
+                                                                                <td align="center"><?= ($db->f('logo') != null) ? "Yes" : "No" ?></td>
+                                                                                <td align="center">
+                                                                                    <span id="<?= (int) $db->f('id') ?>" class="badge <?= $StatusClass ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $db->f('id') ?>)">
+                                                                                        <?= $Status ?>
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td align="center"><?= onlydateshortformat($db->f('storeDate')) ?></td>
+                                                                                <td align="center"><?= $db->f('FullName') ?></td>
+                                                                                <td align="center">
+                                                                                    <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=SortRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" >
+                                                                                        <img src="../admin/images/sort.png">
+                                                                                    </a>
+                                                                                </td>
+                                                                                <td align="center">
+                                                                                    <div class="action-buttons" style="white-space:nowrap;">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" style="margin:0 6px;">
+                                                                                            <i class="icon-pencil"></i>
+                                                                                        </a>
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?= TXT_DELETE_CONFIRM ?>" data-action_msg="<?= TXT_SELECTED_RECORD_DELETED ?>" data-message="<?= TXT_RECORD_DELETE_ACTION ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>" style="margin:0 6px;">
+                                                                                                    <i class="icon-trash txt-danger"></i>
+                                                                                                </a>
+                                                                                     <?php } ?>
+                                                                                            <a href="javascript:;" data-href="AllQuickViewDetails.php?<?= EncodeUrl('Action=StoreDetail&RecordID=' . $db->f('id')) ?>" class="iconhoverbox quickview" style="margin:0 6px;">
+                                                                                                <i class="icon-eye"></i>
+                                                                                            </a>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        <?php
+                                                                        $RecordCount++;
+                                                    }
+                                                    ?>
 
-                                        </tbody>
-                                            </table>
+                                                </tbody>
+                                                    </table>
     
-                                            <script type="text/javascript">
+                                                    <script type="text/javascript">
         
-                                                $(".loader-div").hide();
+                                                        $(".loader-div").hide();
         
-                                            </script>
+                                                    </script>
     
-                                        <?php
+                                                <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -601,24 +614,24 @@ INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-<tr>
-    <td colspan="11">
-        <center>
-            <?php echo $page_links ?? ''; ?>
-        </center>
-    </td>
-</tr>
-<?php
+        <tr>
+            <td colspan="11">
+                <center>
+                    <?php echo $page_links ?? ''; ?>
+                </center>
+            </td>
+        </tr>
+        <?php
     }
 }
 
-                                        // 	while($db->next_Record())
+// 	while($db->next_Record())
 // 	{
 // 		$RecordCount++;
 // 		$Status = ($db->f('active')==1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
 //         $StatusClass =   ($db->f('active')==1)?'badge-success':'badge-danger';
 //         $StatusTracking =   ($db->f('trackingUrl')!="")?'Yes':'No';
-                                        ?>
+?>
                                         <!--		<tr >-->
                                         <!--			<td class="line-height" align="center"><?= $RecordCount ?></td>-->
                                         <!--			<td align="center"><?= $db->f('name') ?></td>-->
@@ -637,9 +650,9 @@ INNER JOIN tblnetwork n ON (n.TableID = s.NetworkID)
                                         <!--            <td align="center">-->
                                         <!--           	 <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" title=""> <i class="icon-pencil"></i> </a>-->
                                         <!--             <?php if ($CheckDeletePermissioon == 1) { ?>-->
-                                                            <!--             &nbsp;&nbsp;-->
-                                                            <!--             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>-->
-                                                            <!--             <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=StoreDetail&RecordID=' . $db->f('id')); ?>" class="iconhoverbox quickview"><i class="icon-eye"></i></a>-->
+                                                                <!--             &nbsp;&nbsp;-->
+                                                                <!--             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>-->
+                                                                <!--             <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=StoreDetail&RecordID=' . $db->f('id')); ?>" class="iconhoverbox quickview"><i class="icon-eye"></i></a>-->
                                                      <?php } ?>
                                           <!--          </td>-->
 
@@ -658,53 +671,53 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingevents'
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left"><?= TXT_TITLE_ENGLISH ?></th>
-                                                        <th align="right" style="text-align:right;"><?= TXT_TITLE_ARABIC ?></th>
-                                                        <th  align="center" style="text-align:center;"><?= TXT_FROM_DATE ?></th>
-                                                        <th  align="center" style="text-align:center;"><?= TXT_TO_DATE ?></th>
-                                                        <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
-                                                        <th width="8%" align="center"><?= TXT_IMAGE_GALLERY ?></th>
-                                                        <th width="8%" align="center"><?= TXT_VIDEO_GALLERY ?></th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="left"><?= $db->f('Title') ?></td>
-                                                                        <td align="right"><?= $db->f('TitleAr') ?></td>
-                                                                        <td align="center"><?= onlydateshortformat($db->f('FromDate')) ?></td>
-                                                                        <td align="center"><?= onlydateshortformat($db->f('ToDate')) ?></td>
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=PageGallery&ParentID=" . $db->f('TableID') . "&TypeID=" . EVENT_MEDIA_TYPE . "&TableName=" . $TableName) ?>" class="iconhoverbox" > <i class="icon-link"></i> </a>
-                                                                        </td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=PageVideo&ParentID=" . $db->f('TableID') . "&TypeID=" . EVENT_MEDIA_TYPE . "&TableName=" . $TableName) ?>" class="iconhoverbox" > <i class="icon-camera"></i> </a>
-                                                                        </td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left"><?= TXT_TITLE_ENGLISH ?></th>
+                                                                <th align="right" style="text-align:right;"><?= TXT_TITLE_ARABIC ?></th>
+                                                                <th  align="center" style="text-align:center;"><?= TXT_FROM_DATE ?></th>
+                                                                <th  align="center" style="text-align:center;"><?= TXT_TO_DATE ?></th>
+                                                                <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
+                                                                <th width="8%" align="center"><?= TXT_IMAGE_GALLERY ?></th>
+                                                                <th width="8%" align="center"><?= TXT_VIDEO_GALLERY ?></th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="left"><?= $db->f('Title') ?></td>
+                                                                                    <td align="right"><?= $db->f('TitleAr') ?></td>
+                                                                                    <td align="center"><?= onlydateshortformat($db->f('FromDate')) ?></td>
+                                                                                    <td align="center"><?= onlydateshortformat($db->f('ToDate')) ?></td>
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=PageGallery&ParentID=" . $db->f('TableID') . "&TypeID=" . EVENT_MEDIA_TYPE . "&TableName=" . $TableName) ?>" class="iconhoverbox" > <i class="icon-link"></i> </a>
+                                                                                    </td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=PageVideo&ParentID=" . $db->f('TableID') . "&TypeID=" . EVENT_MEDIA_TYPE . "&TableName=" . $TableName) ?>" class="iconhoverbox" > <i class="icon-camera"></i> </a>
+                                                                                    </td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -712,14 +725,14 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingevents'
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 
@@ -733,69 +746,69 @@ INNER JOIN `tblcountry` c ON (s.`CountryID` = c.`TableID`)
 INNER JOIN `tbluserregistration_log` u ON (u.`TableID` = s.`CreatedBy`) 
 INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where  $whereCond order by name ASC";
 
-// echo $sql;
+    // echo $sql;
 // exit;
     $db->query($sql);
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                            <thead>
-                                                <tr>
-                                                    <th width="4%" align="center" ><?= SNO ?></th>
-                                                    <th align="left">Name</th>
-                                                    <th align="center" style="text-align:center;">Tracking</th>
-                                                    <th width="8%" align="center">Network</th>
-                                                    <th width="8%" align="center">Logo</th>
-                                        <!--            <th width="8%" align="center">Status</th>-->
-                                                    <th width="8%" align="center">Date</th>
-                                                    <th width="8%" align="center">Created By</th>
-                                                                    <th width="8%" align="center">Update</th>
-                                        <!--                              <th width="8%" align="center">Updated By</th>-->
-                                        <!--            <th width="8%" align="center">/Sort</th>-->
-                                                    <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                </tr>
-                                                </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                                <?php
-                                                while ($db->next_Record()) {
-                                                    $RecordCount++;
-                                                    //            $Status = ($db->f('active')==1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="4%" align="center" ><?= SNO ?></th>
+                                                            <th align="left">Name</th>
+                                                            <th align="center" style="text-align:center;">Tracking</th>
+                                                            <th width="8%" align="center">Network</th>
+                                                            <th width="8%" align="center">Logo</th>
+                                                <!--            <th width="8%" align="center">Status</th>-->
+                                                            <th width="8%" align="center">Date</th>
+                                                            <th width="8%" align="center">Created By</th>
+                                                                            <th width="8%" align="center">Update</th>
+                                                <!--                              <th width="8%" align="center">Updated By</th>-->
+                                                <!--            <th width="8%" align="center">/Sort</th>-->
+                                                            <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                        <?php
+                                                        while ($db->next_Record()) {
+                                                            $RecordCount++;
+                                                            //            $Status = ($db->f('active')==1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
 //            $StatusClass =   ($db->f('active')==1)?'badge-success':'badge-danger';
-                                                    $StatusTracking = ($db->f('trackingUrl') != "") ? 'Yes' : 'No';
+                                                            $StatusTracking = ($db->f('trackingUrl') != "") ? 'Yes' : 'No';
 
-                                                    ?>
-                                                                        <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                            <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                            <td align="center"><?= $db->f('name') ?></td>
-                                                                            <td align="center"><?= $StatusTracking ?></td>
-                                                                            <td align="center"><?= $db->f('NetName') ?></td>
-                                                                            <td align="center"><?php if ($db->f('logo') != null)
-                                                                                echo "Yes";
-                                                                            else
-                                                                                echo "No"; ?></td>
-                                                            <!--                <td align="center" class=""><span id="--=$db->f('id')<--" class="badge /=$StatusClass?>" onclick="UpdateActive('<?//=$Status ?>//' , <?//=$db->f('id') ?>//)" ><?//=$Status ?></span></td>-->
-                                                                            <td align="center"><?= onlydateshortformat($db->f('storeDate')) ?></td>
-                                                                            <td align="center"><?= $db->f('FullName') ?></td>
-                                                                                        <td align="center"><?= $db->f('ModifiedDateTime') ?> </td>
-                                                            <!--                            <td align="center"><?//=$db->f('ModifiedBy') ?>- </td>-->
-                                                            <!--                <td align="center"><a href="<?//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=SortRecord&RecordID=".$db->f('id')."&Trigger  =edit") ?><-" class="iconhoverbox" title="--><?//=TXT_EDIT_RECORD ?><!--"> <img src="../admin/images/sort.png"> </a></td>-->
-                                                                            <td align="center">
-                                                            <!--                    <a href="<?//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=ManageRecord&RecordID=".$db->f('id')."&Trigger=edit") ?><!--" class="iconhoverbox" title="--><?//=TXT_EDIT_RECORD ?><!--"> <i class="icon-pencil"></i> </a>-->
-                                                            <!--                    <a href="<?//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=ManageRecord&RecordID=".$db->f('id')."&Trigger=edit") ?>  " class="iconhoverbox" title="--><?//=TXT_EDIT_RECORD ?><!--"> <i class="icon-pencil"></i> </a>-->
+                                                            ?>
+                                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                        <td align="center"><?= $db->f('name') ?></td>
+                                                                                        <td align="center"><?= $StatusTracking ?></td>
+                                                                                        <td align="center"><?= $db->f('NetName') ?></td>
+                                                                                        <td align="center"><?php if ($db->f('logo') != null)
+                                                                                            echo "Yes";
+                                                                                        else
+                                                                                            echo "No"; ?></td>
+                                                                        <!--                <td align="center" class=""><span id="--=$db->f('id')<--" class="badge /=$StatusClass?>" onclick="UpdateActive('<?//=$Status ?>//' , <?//=$db->f('id') ?>//)" ><?//=$Status ?></span></td>-->
+                                                                                        <td align="center"><?= onlydateshortformat($db->f('storeDate')) ?></td>
+                                                                                        <td align="center"><?= $db->f('FullName') ?></td>
+                                                                                                    <td align="center"><?= $db->f('ModifiedDateTime') ?> </td>
+                                                                        <!--                            <td align="center"><?//=$db->f('ModifiedBy') ?>- </td>-->
+                                                                        <!--                <td align="center"><a href="<?//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=SortRecord&RecordID=".$db->f('id')."&Trigger  =edit") ?><-" class="iconhoverbox" title="--><?//=TXT_EDIT_RECORD ?><!--"> <img src="../admin/images/sort.png"> </a></td>-->
+                                                                                        <td align="center">
+                                                                        <!--                    <a href="<?//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=ManageRecord&RecordID=".$db->f('id')."&Trigger=edit") ?><!--" class="iconhoverbox" title="--><?//=TXT_EDIT_RECORD ?><!--"> <i class="icon-pencil"></i> </a>-->
+                                                                        <!--                    <a href="<?//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=ManageRecord&RecordID=".$db->f('id')."&Trigger=edit") ?>  " class="iconhoverbox" title="--><?//=TXT_EDIT_RECORD ?><!--"> <i class="icon-pencil"></i> </a>-->
 
-                                                                                <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                                        &nbsp;&nbsp;
-                                                                                                        <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring('tblstore') ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                                <!--                        <a href="javascript:;" data-href="AllQuickViewDetails.php?--><?php //echo EncodeUrl('Action=StoreDetail&RecordID='.$db->f('id')); ?><!--" class="iconhoverbox quickview"><i class="icon-eye"></i></a>-->
-                                                                                <?php } ?>
-                                                                            </td>
+                                                                                            <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                                        &nbsp;&nbsp;
+                                                                                                                        <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring('tblstore') ?>" data-id="<?= encodeencriptstring($db->f('id')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                                <!--                        <a href="javascript:;" data-href="AllQuickViewDetails.php?--><?php //echo EncodeUrl('Action=StoreDetail&RecordID='.$db->f('id')); ?><!--" class="iconhoverbox quickview"><i class="icon-eye"></i></a>-->
+                                                                                            <?php } ?>
+                                                                                        </td>
 
-                                                                        </tr>
-                                                                        <?php
-                                                } ?>
-                                                </tbody>
-                                            </table>    <?php
+                                                                                    </tr>
+                                                                                    <?php
+                                                        } ?>
+                                                        </tbody>
+                                                    </table>    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -803,14 +816,14 @@ INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where  $whereCond order
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingslider') {
@@ -822,52 +835,52 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingslider'
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left">URL</th>
-                                        <!--                  <th align="left">Type</th>-->
-                                                          <th align="left">Title</th>
-                                        <!--                  <th align="left">ShowHome</th>-->
-                                                          <th align="left">Code</th>
-                                                        <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left">URL</th>
+                                                <!--                  <th align="left">Type</th>-->
+                                                                  <th align="left">Title</th>
+                                                <!--                  <th align="left">ShowHome</th>-->
+                                                                  <th align="left">Code</th>
+                                                                <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
 
-                                        <!--            	<th width="8%" align="center" style="text-align:center;">--><?//=TXT_IMAGE_GALLERY ?><!--</th>-->
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="left"><?= $db->f('URL') ?></td>
-                                                                        <td align="left"><?= $db->f('Title') ?></td>
-                                                                        <td align="left"><?= $db->f('couponCode') ?></td>
-                                                            <!--            <td align="center" class=""><span class="badge --><?//=$StatusClass ?><!--">--><?//=$Status ?><!--</span></td>-->
-                                                            <!--            <td align="center">-->
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="<?= (int) $db->f('TableID') ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $db->f('TableID') ?>, <?= json_encode($_REQUEST['TableName'] ?? $TableName) ?>)"><?= $Status ?></span></td>
+                                                <!--            	<th width="8%" align="center" style="text-align:center;">--><?//=TXT_IMAGE_GALLERY ?><!--</th>-->
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="left"><?= $db->f('URL') ?></td>
+                                                                                    <td align="left"><?= $db->f('Title') ?></td>
+                                                                                    <td align="left"><?= $db->f('couponCode') ?></td>
+                                                                        <!--            <td align="center" class=""><span class="badge --><?//=$StatusClass ?><!--">--><?//=$Status ?><!--</span></td>-->
+                                                                        <!--            <td align="center">-->
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>" id="<?= (int) $db->f('TableID') ?>" onclick="UpdateActive(<?= json_encode($Status) ?>, <?= (int) $db->f('TableID') ?>, <?= json_encode($_REQUEST['TableName'] ?? $TableName) ?>)"><?= $Status ?></span></td>
 
-                                                                        <!--           	 <a href="//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=PageGallery&ParentID=".$db->f('TableID')."&TypeID=".COURSE_MEDIA_TYPE."&TableName=".$TableName)?>" class="iconhoverbox" > <i class="icon-link"></i> </a>-->
-                                                            <!--            </td>-->
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
+                                                                                    <!--           	 <a href="//="index.php?".EncodeUrl("action=".$_REQUEST['action']."&SubLinkID=".$_REQUEST['SubLinkID']."&PageType=PageGallery&ParentID=".$db->f('TableID')."&TypeID=".COURSE_MEDIA_TYPE."&TableName=".$TableName)?>" class="iconhoverbox" > <i class="icon-link"></i> </a>-->
+                                                                        <!--            </td>-->
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                                <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -875,14 +888,14 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingslider'
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 
@@ -897,41 +910,41 @@ where A.CourseID='" . $_REQUEST['ParentID'] . "' order by A.Sequence ASC";
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left"><?= TXT_TITLE_ENGLISH ?></th>
-                                                        <th align="right" style="text-align:right;"><?= TXT_TITLE_ARABIC ?></th>
-                                                        <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="left"><?= $db->f('Title') ?></td>
-                                                                        <td align="right"><?= $db->f('TitleAr') ?></td>
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecordQuestion&RecordID=" . $db->f('TableID') . "&Trigger=edit&ParentID=" . $_REQUEST['ParentID']) ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30 sort-table">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left"><?= TXT_TITLE_ENGLISH ?></th>
+                                                                <th align="right" style="text-align:right;"><?= TXT_TITLE_ARABIC ?></th>
+                                                                <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="left"><?= $db->f('Title') ?></td>
+                                                                                    <td align="right"><?= $db->f('TitleAr') ?></td>
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecordQuestion&RecordID=" . $db->f('TableID') . "&Trigger=edit&ParentID=" . $_REQUEST['ParentID']) ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -939,14 +952,14 @@ where A.CourseID='" . $_REQUEST['ParentID'] . "' order by A.Sequence ASC";
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 
@@ -961,47 +974,47 @@ order by B.Title" . LANG_SEP_DB . " ASC, A.BookName" . LANG_SEP_DB . " ASC";
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th><?= TXT_CATEGORY ?></th>
-                                                        <th ><?= TXT_BOOK ?></th>
-                                                        <th ><?= TXT_AUTHOR ?></th>
-                                                        <th ><?= TXT_AUDITOR ?></th>
-                                                        <th ><?= TXT_PUBLISHER ?></th>
-                                                        <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td ><?= $db->f('Category') ?></td>
-                                                                        <td ><?= $db->f('BookName' . LANG_SEP_DB) ?></td>
-                                                                        <td ><?= $db->f('AuthorName' . LANG_SEP_DB) ?></td>
-                                                                        <td ><?= $db->f('AuditorName' . LANG_SEP_DB) ?></td>
-                                                                        <td ><?= $db->f('PublisherName' . LANG_SEP_DB) ?></td>
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             &nbsp; &nbsp; <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th><?= TXT_CATEGORY ?></th>
+                                                                <th ><?= TXT_BOOK ?></th>
+                                                                <th ><?= TXT_AUTHOR ?></th>
+                                                                <th ><?= TXT_AUDITOR ?></th>
+                                                                <th ><?= TXT_PUBLISHER ?></th>
+                                                                <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td ><?= $db->f('Category') ?></td>
+                                                                                    <td ><?= $db->f('BookName' . LANG_SEP_DB) ?></td>
+                                                                                    <td ><?= $db->f('AuthorName' . LANG_SEP_DB) ?></td>
+                                                                                    <td ><?= $db->f('AuditorName' . LANG_SEP_DB) ?></td>
+                                                                                    <td ><?= $db->f('PublisherName' . LANG_SEP_DB) ?></td>
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                             &nbsp; &nbsp; <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring($TableName) ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -1009,14 +1022,14 @@ order by B.Title" . LANG_SEP_DB . " ASC, A.BookName" . LANG_SEP_DB . " ASC";
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingsportcomplex') {
@@ -1031,45 +1044,45 @@ order by A.TableID DESC";
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left"><?= TXT_REQUEST_NO ?></th>
-                                                        <th align="left"><?= TXT_NAME ?></th>
-                                                        <th align="left"><?= TXT_GENDER ?></th>
-                                                        <th align="left"><?= TXT_EMAIL ?></th>
-                                                        <th align="left"><?= TXT_NATIONALITY ?></th>
-                                                        <th width="5%" align="center" style="text-align:center;"><?= TXT_STATUS ?></th>
-                                                        <th width="5%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Status') == 0) ? '-' : $db->f('StatusName');
-                                                $StatusClass = ($db->f('Status') > 0) ? 'badge-success' : 'badge-danger';
-                                                $Gender = ($db->f('Gender') == 1) ? TXT_MALE : TXT_FEMALE;
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td ><?= $db->f('RequestNo') ?></td>
-                                                                        <td ><?= $db->f('FullName') ?></td>
-                                                                        <td ><?= $Gender ?></td>
-                                                                        <td ><?= $db->f('Email') ?></td>
-                                                                        <td ><?= $db->f('NationalityName') ?></td>
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" > <i class="icon-eye"></i> </a>
-                                                                        </td>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left"><?= TXT_REQUEST_NO ?></th>
+                                                                <th align="left"><?= TXT_NAME ?></th>
+                                                                <th align="left"><?= TXT_GENDER ?></th>
+                                                                <th align="left"><?= TXT_EMAIL ?></th>
+                                                                <th align="left"><?= TXT_NATIONALITY ?></th>
+                                                                <th width="5%" align="center" style="text-align:center;"><?= TXT_STATUS ?></th>
+                                                                <th width="5%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Status') == 0) ? '-' : $db->f('StatusName');
+                                                        $StatusClass = ($db->f('Status') > 0) ? 'badge-success' : 'badge-danger';
+                                                        $Gender = ($db->f('Gender') == 1) ? TXT_MALE : TXT_FEMALE;
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td ><?= $db->f('RequestNo') ?></td>
+                                                                                    <td ><?= $db->f('FullName') ?></td>
+                                                                                    <td ><?= $Gender ?></td>
+                                                                                    <td ><?= $db->f('Email') ?></td>
+                                                                                    <td ><?= $db->f('NationalityName') ?></td>
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" > <i class="icon-eye"></i> </a>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -1077,14 +1090,14 @@ order by A.TableID DESC";
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingpublicationsubmission') {
@@ -1096,35 +1109,35 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingpublica
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                 <thead>
-                                                      <tr>
-                                                          <th width="4%" align="center" ><?= SNO ?></th>
-                                                          <th align="left">Title</th>
-                                                          <th align="center" style="text-align:center;">Description</th>
-                                                          <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Status') == 0) ? '-' : $db->f('StatusName');
-                                                $StatusClass = ($db->f('Status') > 0) ? 'badge-success' : 'badge-danger';
-                                                $Gender = ($db->f('Gender') == 1) ? TXT_MALE : TXT_FEMALE;
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="center"><?= $db->f('Title') ?></td>
-                                                                        <td align="center"><?= $db->f('Description') ?></td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                        </td> 
-                                                                    </tr>
-                                            <?php } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                         <thead>
+                                                              <tr>
+                                                                  <th width="4%" align="center" ><?= SNO ?></th>
+                                                                  <th align="left">Title</th>
+                                                                  <th align="center" style="text-align:center;">Description</th>
+                                                                  <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody data-tablename="<?= encodeencriptstring("$TableName") ?>">
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Status') == 0) ? '-' : $db->f('StatusName');
+                                                        $StatusClass = ($db->f('Status') > 0) ? 'badge-success' : 'badge-danger';
+                                                        $Gender = ($db->f('Gender') == 1) ? TXT_MALE : TXT_FEMALE;
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="center"><?= $db->f('Title') ?></td>
+                                                                                    <td align="center"><?= $db->f('Description') ?></td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('id') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                    </td> 
+                                                                                </tr>
+                                                    <?php } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -1132,14 +1145,14 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingpublica
 
     if (isset($pagination) && $pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 
@@ -1154,44 +1167,44 @@ order by A.TableID DESC";
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th align="left"><?= TXT_REQUEST_NO ?></th>
-                                                        <th align="left"><?= TXT_COURSE ?></th>
-                                                        <th align="left"><?= TXT_REGISTER_NO ?></th>
-                                                        <th align="left"><?= TXT_NAME ?></th>
-                                                        <th align="left"><?= TXT_EMAIL ?></th>
-                                                        <th width="5%" align="center" style="text-align:center;"><?= TXT_STATUS ?></th>
-                                                        <th width="5%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody >
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $StatusClass = ($db->f('IsPassed') > 0) ? 'badge-success' : 'badge-danger';
-                                                $Status = ($db->f('IsPassed') == 1) ? TXT_PASS : TXT_FAIL;
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td ><?= $db->f('RequestNo') ?></td>
-                                                                        <td ><?= $db->f('CourseName') ?></td>
-                                                                        <td ><?= $db->f('RegID') ?></td>
-                                                                        <td ><?= $db->f('SubmitName') ?></td>
-                                                                        <td ><?= $db->f('Email') ?></td>
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
-                                                                        <td align="center">
-                                                                        <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=TestDetails&RecordID=' . $db->f('TableID')); ?>" class="iconhoverbox quickview"><i class="icon-eye"></i></a>
-                                                                        </td>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th align="left"><?= TXT_REQUEST_NO ?></th>
+                                                                <th align="left"><?= TXT_COURSE ?></th>
+                                                                <th align="left"><?= TXT_REGISTER_NO ?></th>
+                                                                <th align="left"><?= TXT_NAME ?></th>
+                                                                <th align="left"><?= TXT_EMAIL ?></th>
+                                                                <th width="5%" align="center" style="text-align:center;"><?= TXT_STATUS ?></th>
+                                                                <th width="5%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody >
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $StatusClass = ($db->f('IsPassed') > 0) ? 'badge-success' : 'badge-danger';
+                                                        $Status = ($db->f('IsPassed') == 1) ? TXT_PASS : TXT_FAIL;
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td ><?= $db->f('RequestNo') ?></td>
+                                                                                    <td ><?= $db->f('CourseName') ?></td>
+                                                                                    <td ><?= $db->f('RegID') ?></td>
+                                                                                    <td ><?= $db->f('SubmitName') ?></td>
+                                                                                    <td ><?= $db->f('Email') ?></td>
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
+                                                                                    <td align="center">
+                                                                                    <a href="javascript:;" data-href="AllQuickViewDetails.php?<?php echo EncodeUrl('Action=TestDetails&RecordID=' . $db->f('TableID')); ?>" class="iconhoverbox quickview"><i class="icon-eye"></i></a>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -1199,14 +1212,14 @@ order by A.TableID DESC";
 
     if ($pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingnewslettercontact') {
@@ -1219,40 +1232,40 @@ order by B.Title" . LANG_SEP_DB . " ASC ";
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                 <thead>
-                                                      <tr>
-                                                        <th width="4%" align="center" ><?= SNO ?></th>
-                                                        <th><?= TXT_CATEGORY ?></th>
-                                                        <th><?= TXT_NAME ?></th>
-                                                        <th><?= TXT_EMAIL ?></th>
-                                                        <th><?= TXT_MOBILE ?></th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                      </tr>
-                                                    </thead>
-                                                <tbody >
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
-                                                ?>
-                                                                    <tr id="listItem_<?= $db->f('TableID') ?>">
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td ><?= $db->f('Category') ?></td>
-                                                                        <td ><?= $db->f('FullName') ?></td>
-                                                                        <td ><?= $db->f('Email') ?></td>
-                                                                        <td ><?= $db->f('MobileNumber') ?></td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                        </td>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                         <thead>
+                                                              <tr>
+                                                                <th width="4%" align="center" ><?= SNO ?></th>
+                                                                <th><?= TXT_CATEGORY ?></th>
+                                                                <th><?= TXT_NAME ?></th>
+                                                                <th><?= TXT_EMAIL ?></th>
+                                                                <th><?= TXT_MOBILE ?></th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                              </tr>
+                                                            </thead>
+                                                        <tbody >
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        ?>
+                                                                                <tr id="listItem_<?= $db->f('TableID') ?>">
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td ><?= $db->f('Category') ?></td>
+                                                                                    <td ><?= $db->f('FullName') ?></td>
+                                                                                    <td ><?= $db->f('Email') ?></td>
+                                                                                    <td ><?= $db->f('MobileNumber') ?></td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                    </td>
 
-                                                                    </tr>
-                                                                <?php
-                                            } ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                </tr>
+                                                                            <?php
+                                                    } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -1260,14 +1273,14 @@ order by B.Title" . LANG_SEP_DB . " ASC ";
 
     if ($pagination->tot_pages > 1) {
         ?>
-                                                <tr>
-                                                    <td colspan="11">
-                                                        <center>
-                                                              <?php echo $page_links; ?>
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                                <?php
+                                                        <tr>
+                                                            <td colspan="11">
+                                                                <center>
+                                                                      <?php echo $page_links; ?>
+                                                                </center>
+                                                            </td>
+                                                        </tr>
+                                                        <?php
     }
 }
 if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingnewsletter') {
@@ -1286,42 +1299,42 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingnewslet
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                <thead>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                        <thead>
 
-                                                  <tr>
-                                                    <th width="4%" align="center"><?= SNO ?></a></th>
-                                                    <th align="left"><?= TXT_TITLE ?></th>
-                                                        <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
-                                                        <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                  </tr>
-                                                </thead>
-                                                <tbody>
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
-                                                $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
-                                                ?>
-                                                                    <tr>
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="left"><?= $db->f('Title') ?></td>
-                                                                        <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
+                                                          <tr>
+                                                            <th width="4%" align="center"><?= SNO ?></a></th>
+                                                            <th align="left"><?= TXT_TITLE ?></th>
+                                                                <th width="8%" align="center"><?= TXT_ACTIVE_USER ?></th>
+                                                                <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        $Status = ($db->f('Active') == 1) ? TXT_ACTIVE : TXT_IN_ACTIVE;
+                                                        $StatusClass = ($db->f('Active') == 1) ? 'badge-success' : 'badge-danger';
+                                                        ?>
+                                                                                <tr>
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="left"><?= $db->f('Title') ?></td>
+                                                                                    <td align="center" class=""><span class="badge <?= $StatusClass ?>"><?= $Status ?></span></td>
 
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             &nbsp;&nbsp;
-                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring('tblnewsletters') ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
-                                                                    </tr>
-                                                                <?php
-                                            }
-                                            ?>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                             &nbsp;&nbsp;
+                                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring('tblnewsletters') ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            <?php
+                                                    }
+                                                    ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';
@@ -1353,70 +1366,70 @@ if (isset($_REQUEST['FireAction']) && $_REQUEST['FireAction'] == 'listingcampaig
     $RecordCount = 0;
     if ($db->num_rows() > 0) {
         ?>
-                                            <table id="datable_1" class="table table-hover w-100 display pb-30">
-                                                <thead>
-                                                  <tr>
-                                                    <th width="4%" align="center"><?= SNO ?></a></th>
-                                                    <th align="left"><?= TXT_TITLE ?></th>
-                                                    <th align="left"><?= TXT_NEWSLETTER ?></th>
-                                                    <th align="left"><?= TXT_CONTACT_CATEGORY ?></th>
-                                                    <th align="center" style="text-align:center;"><?= TXT_START_DATE ?></th>
-                                                    <th align="center" style="text-align:center;"><?= TXT_TOTAL ?></th>
-                                                    <th align="center" style="text-align:center;"><?= TXT_SENT ?></th>
-                                                    <th align="center" style="text-align:center;"><?= TXT_VIEWED ?></th>
-                                                    <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
-                                                  </tr>
-                                                </thead>
-                                                <tbody>
-                                            <?php
-                                            while ($db->next_Record()) {
-                                                $RecordCount++;
-                                                // $Status = ($db->f('Active')==1)?TXT_ACTIVE:TXT_IN_ACTIVE;
-                                                // $StatusClass =   ($db->f('Active')==1)?'badge-success':'badge-danger';
-                                                $Total = $db->f('TotalContact');
-                                                $Sent = getCountRecord("tblemailsentlog", "CampaignID", $db->f('TableID'));
-                                                $Viewed = getCountRecord("tblemailsentlog", "CampaignID", $db->f('TableID') . " AND IsViewed=1");
-                                                $GrandTotal += $Total;
-                                                $GrandSent += $Sent;
-                                                $GrandViewed += $Viewed;
-                                                ?>
-                                                                    <tr>
-                                                                        <td class="line-height" align="center"><?= $RecordCount ?></td>
-                                                                        <td align="left"><?= $db->f('Title') ?></td>
-                                                                        <td align="left"><?= $db->f('NewletterTitle') ?></td>
-                                                                        <td align="left"><?= $db->f('ContactCategory') ?></td>
-                                                                        <td align="center"><?= onlydateshortformat($db->f('CampaignStartDate')) ?></td>
-                                                                        <td align="center"><?= $Total ?></td>
-                                                                        <td align="center"><?= $Sent ?></td>
-                                                                        <td align="center"><?= $Viewed ?></td>
-                                                                        <td align="center">
-                                                                            <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
-                                                                         <?php if ($CheckDeletePermissioon == 1) { ?>
-                                                                                             &nbsp;&nbsp;
-                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring('tblcampaigns') ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
-                                                                         <?php } ?>
-                                                                        </td>
-                                                                    </tr>
-                                                                <?php
-                                            }
-                                            ?>
+                                                    <table id="datable_1" class="table table-hover w-100 display pb-30">
+                                                        <thead>
+                                                          <tr>
+                                                            <th width="4%" align="center"><?= SNO ?></a></th>
+                                                            <th align="left"><?= TXT_TITLE ?></th>
+                                                            <th align="left"><?= TXT_NEWSLETTER ?></th>
+                                                            <th align="left"><?= TXT_CONTACT_CATEGORY ?></th>
+                                                            <th align="center" style="text-align:center;"><?= TXT_START_DATE ?></th>
+                                                            <th align="center" style="text-align:center;"><?= TXT_TOTAL ?></th>
+                                                            <th align="center" style="text-align:center;"><?= TXT_SENT ?></th>
+                                                            <th align="center" style="text-align:center;"><?= TXT_VIEWED ?></th>
+                                                            <th width="10%" align="center" style="text-align:center;"><?= TXT_ACTION ?></th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                    <?php
+                                                    while ($db->next_Record()) {
+                                                        $RecordCount++;
+                                                        // $Status = ($db->f('Active')==1)?TXT_ACTIVE:TXT_IN_ACTIVE;
+                                                        // $StatusClass =   ($db->f('Active')==1)?'badge-success':'badge-danger';
+                                                        $Total = $db->f('TotalContact');
+                                                        $Sent = getCountRecord("tblemailsentlog", "CampaignID", $db->f('TableID'));
+                                                        $Viewed = getCountRecord("tblemailsentlog", "CampaignID", $db->f('TableID') . " AND IsViewed=1");
+                                                        $GrandTotal += $Total;
+                                                        $GrandSent += $Sent;
+                                                        $GrandViewed += $Viewed;
+                                                        ?>
+                                                                                <tr>
+                                                                                    <td class="line-height" align="center"><?= $RecordCount ?></td>
+                                                                                    <td align="left"><?= $db->f('Title') ?></td>
+                                                                                    <td align="left"><?= $db->f('NewletterTitle') ?></td>
+                                                                                    <td align="left"><?= $db->f('ContactCategory') ?></td>
+                                                                                    <td align="center"><?= onlydateshortformat($db->f('CampaignStartDate')) ?></td>
+                                                                                    <td align="center"><?= $Total ?></td>
+                                                                                    <td align="center"><?= $Sent ?></td>
+                                                                                    <td align="center"><?= $Viewed ?></td>
+                                                                                    <td align="center">
+                                                                                        <a href="<?= "index.php?" . EncodeUrl("action=" . $_REQUEST['action'] . "&SubLinkID=" . $_REQUEST['SubLinkID'] . "&PageType=ManageRecord&RecordID=" . $db->f('TableID') . "&Trigger=edit") ?>" class="iconhoverbox" title="<?= TXT_EDIT_RECORD ?>"> <i class="icon-pencil"></i> </a>
+                                                                                     <?php if ($CheckDeletePermissioon == 1) { ?>
+                                                                                                             &nbsp;&nbsp;
+                                                                                                             <a class="deleterecord iconhoverbox" href="#" data-action_title="<?php echo TXT_DELETE_CONFIRM; ?>" data-action_msg="<?php echo TXT_SELECTED_RECORD_DELETED; ?>" data-message="<?php echo TXT_RECORD_DELETE_ACTION; ?>" data-action="<?= encodeencriptstring('DeleteRecord') ?>" data-table="<?= encodeencriptstring('tblcampaigns') ?>" data-id="<?= encodeencriptstring($db->f('TableID')) ?>"  title="<?= TXT_DELETE_RECORD ?>"> <i class="icon-trash txt-danger"></i> </a>
+                                                                                     <?php } ?>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            <?php
+                                                    }
+                                                    ?>
 
-                                                <tfoot>
-                                                <tr>
-                                                    <th ></th>
-                                                    <th ></th>
-                                                    <th ></th>
-                                                    <th ></th>
-                                                    <th align="right" style="text-align:<?= ALIGN_MENT ?>"><?= TXT_GRAND_TOTAL ?></th>
-                                                    <th align="center" style="text-align:center"><?= $GrandTotal ?></th>
-                                                    <th align="center" style="text-align:center"><?= $GrandSent ?></th>
-                                                    <th align="center" style="text-align:center"><?= $GrandViewed ?></th>
-                                                    <td ></td>
-                                                </tr>
-                                                <tfoot>
-                                                </tbody>
-                                            </table>
-                                            <?php
+                                                        <tfoot>
+                                                        <tr>
+                                                            <th ></th>
+                                                            <th ></th>
+                                                            <th ></th>
+                                                            <th ></th>
+                                                            <th align="right" style="text-align:<?= ALIGN_MENT ?>"><?= TXT_GRAND_TOTAL ?></th>
+                                                            <th align="center" style="text-align:center"><?= $GrandTotal ?></th>
+                                                            <th align="center" style="text-align:center"><?= $GrandSent ?></th>
+                                                            <th align="center" style="text-align:center"><?= $GrandViewed ?></th>
+                                                            <td ></td>
+                                                        </tr>
+                                                        <tfoot>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php
     }
     if ($RecordCount == 0) {
         echo '<div class="norecordfound">' . DSB_NO_RECORDS . '</div>';

@@ -4,18 +4,27 @@ class pagination {
 	var $full_sql, $per_page, $cur_page, $tot_pages, $offset, $refresh_div, $ajax_form;
 	
 	function __construct($full_sql, $per_page, $cur_page, $refresh_div, $ajax_form) {
-		global $dbPagination; //get db connection
-		$this->full_sql = $full_sql;
-		$this->per_page = $per_page;
-		$this->cur_page = $cur_page;
-		$this->refresh_div = $refresh_div;
-		$this->ajax_form = !$ajax_form ? 'null' : $ajax_form;
-		
-		$sqlt = $full_sql;
-		$rsdt = $dbPagination->query($sqlt);
-		$total = $dbPagination->num_rows();
-		$this->tot_pages = ceil($total/$per_page);
-	}
+    global $dbPagination; //get db connection
+    $this->full_sql = $full_sql;
+    $this->per_page = $per_page;
+    $this->cur_page = $cur_page;
+    $this->refresh_div = $refresh_div;
+    $this->ajax_form = !$ajax_form ? 'null' : $ajax_form;
+    
+    // 🔥 FIX: ORDER BY ko count query se hatao
+    $sqlForCount = $full_sql;
+    $orderByPos = strripos($sqlForCount, 'ORDER BY');
+    if ($orderByPos !== false) {
+        $sqlForCount = substr($sqlForCount, 0, $orderByPos);
+    }
+    
+    $countSql = "SELECT COUNT(*) as total FROM (" . $sqlForCount . ") as temp_table";
+    $dbPagination->query($countSql);
+    $dbPagination->next_record();
+    $total = $dbPagination->f('total');
+    
+    $this->tot_pages = ceil($total/$per_page);
+}
 	
 	function get_query() {
 		$this->offset = ($this->cur_page - 1) * $this->per_page;
