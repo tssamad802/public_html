@@ -310,13 +310,13 @@ class pagination {
 		
 		$link = $UrlData;
 		 
-		$urlParam = $_SERVER['QUERY_STRING'];
-		//check url is encrypted
-		if (CheckIsBase64($urlParam))
-		{
-						$urlParam = decodeencriptstring($urlParam);
-		}
-		$link .= "?".$urlParam.'&';
+		// $urlParam = $_SERVER['QUERY_STRING'];
+		// //check url is encrypted
+		// if (CheckIsBase64($urlParam))
+		// {
+		// 				$urlParam = decodeencriptstring($urlParam);
+		// }
+		// $link .= "?".$urlParam.'&';
 	   
 		/*if(count($_SERVER['QUERY_STRING']))
 		{
@@ -405,7 +405,7 @@ class pagination {
 			//previous link - if current page is first page: no link
 			if ($this->cur_page > 1) {
 				$prev  = $this->cur_page - 1;
-				$page_link .= "<li class='paginate_button page-item'> <a onclick=\"SimpleAjax('dddd".$link."start=$prev','".$this->ajax_form."','".$this->refresh_div."');\" class='page-link'	>&laquo;</a> </li>";
+				$page_link .= "<li class='paginate_button page-item'> <a onclick=\"SimpleAjax('".$link."start=$prev','".$this->ajax_form."','".$this->refresh_div."');\" class='page-link'>&laquo;</a> </li>";
 			}
 			else {
 				$page_link .= "<li class='paginate_button page-item'><a href='#' class='page-link'>&laquo;</a></li>";
