@@ -76,10 +76,13 @@ ORDER BY s.name, c.Sequence";   // No semicolon here
     // exit;
     // exit($sql);
 
-    // current page (start) is the page number; default to 1
-    $start = isset($_REQUEST['start']) && is_numeric($_REQUEST['start']) ? max(1, (int) $_REQUEST['start']) : 1;
-    // allow configurable items per page via request (fallback to 100)
-    $per_page = isset($_REQUEST['per_page']) && is_numeric($_REQUEST['per_page']) ? max(1, (int) $_REQUEST['per_page']) : 100;
+    $start = isset($_REQUEST['start']) && is_numeric($_REQUEST['start'])
+        ? max(1, (int) $_REQUEST['start'])
+        : 1;
+
+    $per_page = isset($_REQUEST['per_page']) && is_numeric($_REQUEST['per_page'])
+        ? max(1, (int) $_REQUEST['per_page'])
+        : 20;
 
     $pagination = new pagination($sql, $per_page, $start, $refresh_div, 'searchfrm');
     $sql_page = $pagination->get_query();
