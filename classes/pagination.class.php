@@ -3,7 +3,11 @@
 class pagination {
 	var $full_sql, $per_page, $cur_page, $tot_pages, $offset, $refresh_div, $ajax_form;
 	
+<<<<<<< HEAD
 	function __construct($full_sql, $per_page, $cur_page, $refresh_div, $ajax_form) {
+=======
+	function __construct($full_sql, $per_page, $cur_page, $refresh_div, $ajax_form, $count_sql = '') {
+>>>>>>> 8923dc38 (fix: resolve multiple bugs in coupon insertion)
     global $dbPagination; //get db connection
     $this->full_sql = $full_sql;
     $this->per_page = $per_page;
@@ -11,6 +15,7 @@ class pagination {
     $this->refresh_div = $refresh_div;
     $this->ajax_form = !$ajax_form ? 'null' : $ajax_form;
     
+<<<<<<< HEAD
     // 🔥 FIX: ORDER BY ko count query se hatao
     $sqlForCount = $full_sql;
     $orderByPos = strripos($sqlForCount, 'ORDER BY');
@@ -19,6 +24,20 @@ class pagination {
     }
     
     $countSql = "SELECT COUNT(*) as total FROM (" . $sqlForCount . ") as temp_table";
+=======
+    if (!empty($count_sql)) {
+        $countSql = $count_sql;
+    } else {
+        // 🔥 FIX: ORDER BY ko count query se hatao
+        $sqlForCount = $full_sql;
+        $orderByPos = strripos($sqlForCount, 'ORDER BY');
+        if ($orderByPos !== false) {
+            $sqlForCount = substr($sqlForCount, 0, $orderByPos);
+        }
+        $countSql = "SELECT COUNT(*) as total FROM (" . $sqlForCount . ") as temp_table";
+    }
+    
+>>>>>>> 8923dc38 (fix: resolve multiple bugs in coupon insertion)
     $dbPagination->query($countSql);
     $dbPagination->next_record();
     $total = $dbPagination->f('total');

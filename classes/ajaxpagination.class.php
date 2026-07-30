@@ -1,11 +1,11 @@
 <?php
 class PerPage {
 	public $perpage;
-	public $perpagesearch;
+	public $perpagesearch; 
 	
 	function __construct() {
-		$this->perpage = defined('PAGINATION_COUNT') ? PAGINATION_COUNT : 24;
-		$this->perpagesearch = defined('PAGINATION_COUNT_SEARCH') ? PAGINATION_COUNT_SEARCH : $this->perpage;
+		$this->perpage = PAGINATION_COUNT;
+		$this->perpagesearch = PAGINATION_COUNT_SEARCH;
 	}
 	
 	function getAllPageLinks($count,$url,$formId,$divId) {

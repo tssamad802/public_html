@@ -500,7 +500,7 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
                                         <div class="col-md-6 mb-10">
                                             <label >Coupon Tag <span>*</span></label>
                                             <select class="form-control custom-select select2" name="CouponTagID">
-                                                <option>Select Tag</option>
+                                                <option value="">Select Tag</option>
                                                 <?php
                                                 echo fillcombocontrol($FetchData['CouponTagID'],"TableID","Title","tblcoupontag where Active=1","Sequence");
                                                 ?>
@@ -660,17 +660,17 @@ else if(isset($_REQUEST['PageType']) && $_REQUEST['PageType']=='ManageRecord')
 		}
         </script>
     <script>
-    const showCouponCode=() =>
-    {
-        if($('#couponClassification').val() == "offer") {
-            $('#couponCode').css('display', 'none');
-            $('#couponCodeAttr').prop("required", false);
-        }
-        else {
-            $('#couponCode').css('display', 'block');
-            $('#couponCodeAttr').prop("required", true);
-        }
-    }
+    // const showCouponCode=() =>
+    // {
+    //     if($('#couponClassification').val() == "offer") {
+    //         $('#couponCode').css('display', 'none');
+    //         $('#couponCodeAttr').prop("required", false);
+    //     }
+    //     else {
+    //         $('#couponCode').css('display', 'block');
+    //         $('#couponCodeAttr').prop("required", true);
+    //     }
+    // }
     $('#sitewide').val('<?= htmlspecialchars($FetchData['sitewide'], ENT_QUOTES, 'UTF-8') ?>');
     let url ;
     const BuildURL = () => {

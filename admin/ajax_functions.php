@@ -1966,6 +1966,7 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 			$ShowHome = 1;
 		}
 
+		$couponTagID = trim($_POST['CouponTagID'] ?? '');
 		$Query .= "CouponName='" . secureTextForDb($_POST['CouponName'] ?? '') . "',
 					url='" . secureTextForDb($_POST['url'] ?? '') . "',  
 					trackingLink='" . secureTextForDb($_POST['trackingLink'] ?? '') . "', 
@@ -1973,7 +1974,7 @@ else if ($ActionFlag == 'EditSystemUserconfiguration') {
 					webUrl='" . secureTextForDb($_POST['webUrl'] ?? '') . "' ,  
 					Active='" . secureTextForDb($_POST['Active'] ?? '') . "' ,   
 					ShowHome='" . secureTextForDb($ShowHome) . "' ,    
-					CouponTagID='" . secureTextForDb($_POST['CouponTagID'] ?? '') . "' ,  
+					CouponTagID=" . ($couponTagID === '' ? "NULL" : (int)$couponTagID) . ", 
 					startDate='" . secureTextForDb($_POST['startDate'] ?? '') . "' , 
 					endDate='" . secureTextForDb($_POST['endDate'] ?? '') . "' ,  
 					StoreID='" . secureTextForDb($_POST['StoreID'] ?? '') . "' ,  

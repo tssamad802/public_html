@@ -7,15 +7,11 @@ if (!isset($RUNFILE_FROM_INDEX_PAGE)) {
 // $Query="select count(TableID) as stores , (select count(TableID)  from tblstore where Active = 1) as enableStores ,
 //         (select count(TableID) from tblstore where Active = 0) as disableStores from tblstore";
 
-$Query = "select count(*) as stores , (SELECT count(*) FROM tblstore s INNER JOIN `tblcountry` c ON (s.`CountryID` = c.`TableID`) 
-INNER JOIN `tblsystemusers` u ON (u.`TableID` = s.`CreatedBy`) 
-INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where s.Active = 1) as enableStores , (SELECT count(*) FROM tblstore s INNER JOIN `tblcountry` c ON (s.`CountryID` = c.`TableID`) 
-INNER JOIN `tblsystemusers` u ON (u.`TableID` = s.`CreatedBy`) 
-INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) where s.Active = 0) as disableStores from tblstore s 
-INNER JOIN `tblcountry` c ON (s.`CountryID` = c.`TableID`) 
-INNER JOIN `tblsystemusers` u ON (u.`TableID` = s.`CreatedBy`)
-INNER JOIN tblnetwork n ON (n.`TableID` = s.`NetworkID`) 
-where s.active IN(1,0)";
+$Query = "SELECT 
+    COUNT(*) as stores,
+    SUM(IF(Active = 1, 1, 0)) as enableStores,
+    SUM(IF(Active = 0, 1, 0)) as disableStores
+FROM tblstore";
 
 // echo "<script>console.log(" . json_encode($Query) . ");</script>";
 
@@ -25,16 +21,12 @@ while ($db->next_record()) {
     $TotalEnable = $db->f('enableStores');
     $TotalDisable = $db->f('disableStores');
 }
-$Query = "SELECT COUNT(*) AS TotalCoupon ,
-    (SELECT COUNT(*) FROM `tblcoupon` c 
-INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`) 
-INNER JOIN  `tblsystemusers` u ON (u.`TableID` = c.`CreatedBy` ) WHERE c.Active = 1) AS EnableCoupon , 
-    (SELECT COUNT(*) FROM `tblcoupon` c 
-INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`) 
-INNER JOIN  `tblsystemusers` u ON (u.`TableID` = c.`CreatedBy` ) where c.Active = 0) AS DisableCoupon ,
-     (SELECT COUNT(*) FROM `tblcoupon` c 
-INNER JOIN `tblstore` s ON (c.`StoreID` = s.`TableID`) 
-INNER JOIN  `tblsystemusers` u ON (u.`TableID` = c.`CreatedBy` ) where c.featured = 1) AS featured FROM tblcoupon";
+$Query = "SELECT 
+    COUNT(*) AS TotalCoupon,
+    SUM(IF(Active = 1, 1, 0)) AS EnableCoupon,
+    SUM(IF(Active = 0, 1, 0)) AS DisableCoupon,
+    SUM(IF(featured = 1, 1, 0)) AS featured
+FROM tblcoupon";
 
 
 $db->query($Query);
@@ -45,15 +37,12 @@ while ($db->next_record()) {
     $Featured = $db->f('featured');
 }
 
-$Query = "SELECT COUNT(*) AS TotalProduct  ,
-(SELECT COUNT(*) FROM tblproduct p 
-INNER JOIN `tblstore` s ON (p.`StoreID` = s.`TableID`) 
-INNER JOIN  `tblsystemusers` u ON (u.`TableID` = p.`CreatedBy` ) WHERE p.Active = 1) AS EnableProduct  , 
-(SELECT COUNT(*) FROM tblproduct p 
-INNER JOIN `tblstore` s ON (p.`StoreID` = s.`TableID`) 
-INNER JOIN  `tblsystemusers` u ON (u.`TableID` = p.`CreatedBy` ) WHERE p.Active = 0) AS DisableProduct  ,
-(SELECT COUNT(*) FROM `tblproduct`p INNER JOIN `tblstore` s ON (p.`StoreID` = s.`TableID`) 
-INNER JOIN  `tblsystemusers` u ON (u.`TableID` = p.`CreatedBy` ) WHERE p.featured = 1) AS featured FROM tblproduct";
+$Query = "SELECT 
+    COUNT(*) AS TotalProduct,
+    SUM(IF(Active = 1, 1, 0)) AS EnableProduct,
+    SUM(IF(Active = 0, 1, 0)) AS DisableProduct,
+    SUM(IF(featured = 1, 1, 0)) AS featured
+FROM tblproduct";
 
 $db->query($Query);
 while ($db->next_record()) {
